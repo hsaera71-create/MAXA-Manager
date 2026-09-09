@@ -2,1004 +2,3529 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TAJWAY — Discover Tajikistan</title>
 
-<title>MAXA Manager</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent
 }
 
-:root {
-    --bg: #0b0c0f;
-    --card: #14161b;
-    --card2: #1b1e24;
-    --line: #282c34;
-    --text: #f5f5f5;
-    --muted: #9298a3;
-    --accent: #ffffff;
-    --accentText: #0b0c0f;
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  background:#f4f7f8;
+  color:#172027
 }
 
-body.light {
-    --bg: #f4f5f7;
-    --card: #ffffff;
-    --card2: #eceef1;
-    --line: #dfe2e7;
-    --text: #111318;
-    --muted: #6e7480;
-    --accent: #111318;
-    --accentText: #ffffff;
-}
-
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-body {
-    padding-bottom: 75px;
-}
-
-/* HEADER */
-
-.header {
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: var(--bg);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--accent);
-    color: var(--accentText);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    font-size: 18px;
-}
-
-.brand-name {
-    font-weight: 900;
-    font-size: 18px;
-}
-
-.brand-version {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 3px;
-}
-
-.menu-button {
-    width: 43px;
-    height: 43px;
-    border-radius: 13px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    color: var(--text);
-    font-size: 21px;
+#map{
+  position:fixed;
+  inset:0;
+  z-index:1
 }
 
 /* SEARCH */
-
-.search {
-    margin: 2px 16px 16px;
-    height: 48px;
-    border: 1px solid var(--line);
-    border-radius: 15px;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    gap: 9px;
+.topbar{
+  position:fixed;
+  top:10px;
+  left:6px;
+  right:6px;
+  z-index:1000
 }
 
-.search span {
-    color: var(--muted);
-    font-size: 19px;
+.searchbox{
+  width:100%;
+  height:58px;
+  background:#fff;
+  border-radius:30px;
+  box-shadow:0 5px 24px #0002;
+  display:flex;
+  align-items:center;
+  padding:6px 7px 6px 17px
 }
 
-.search input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: var(--text);
-    font-size: 14px;
+.logo{
+  font-size:23px;
+  font-weight:900;
+  color:#168447;
+  margin-right:12px;
+  white-space:nowrap
 }
 
-.search input::placeholder {
-    color: var(--muted);
+#searchInput{
+  flex:1;
+  min-width:0;
+  width:0;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-size:17px;
+  color:#172027
 }
 
-/* MAIN */
-
-main {
-    padding: 0 16px;
+#searchBtn{
+  width:46px;
+  height:46px;
+  border:0;
+  border-radius:16px;
+  background:#168447;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center
 }
 
-.path {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 12px 13px;
-    border: 1px solid var(--line);
-    background: var(--card);
-    border-radius: 13px;
-    font-size: 12px;
-    margin-bottom: 10px;
+/* SVG */
+.svgIcon{
+  width:22px;
+  height:22px;
+  display:block;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round
 }
 
-.path strong {
-    color: var(--text);
+.searchIcon{
+  width:22px;
+  height:22px
 }
 
-.path span {
-    color: var(--muted);
+/* MAP BUTTONS */
+.mapButtons{
+  position:fixed;
+  right:12px;
+  top:80px;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+  gap:8px
 }
 
-/* FILES */
-
-.file {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 7px;
-    border-bottom: 1px solid var(--line);
+.mapBtn{
+  width:48px;
+  height:48px;
+  border:0;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 4px 18px #0003;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#172027
 }
 
-.file-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    background: var(--card2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
+.mapBtn.green{
+  background:#168447;
+  color:#fff
 }
 
-.file-info {
-    flex: 1;
-    min-width: 0;
+.mapBtn:active{
+  transform:scale(.94)
 }
 
-.file-name {
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* TRANSPORT */
+.transportPanel{
+  position:fixed;
+  z-index:1500;
+  left:10px;
+  right:10px;
+  top:80px;
+  max-height:78vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 12px 40px #0003;
+  padding:15px;
+  display:none
 }
 
-.file-meta {
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 4px;
+.transportPanel.show{
+  display:block
 }
 
-.file-more {
-    background: transparent;
-    color: var(--muted);
-    font-size: 20px;
+.transportHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center
 }
 
-/* BOTTOM */
-
-.bottom {
-    position: fixed;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    height: 57px;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--card);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    z-index: 30;
+.transportTitle{
+  font-size:21px;
+  font-weight:900
 }
 
-.bottom button {
-    background: transparent;
-    color: var(--muted);
-    font-size: 20px;
+.closeBtn{
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:13px;
+  background:#eef0f1;
+  font-size:24px
 }
 
-.bottom button.active {
-    color: var(--text);
+.transportSubtitle{
+  font-size:14px;
+  color:#777;
+  margin:3px 0 12px
 }
 
-/* SIDE MENU */
-
-.overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: rgba(0,0,0,.55);
+.modeTabs{
+  display:flex;
+  gap:7px;
+  margin-bottom:10px
 }
 
-.overlay.show {
-    display: block;
+.modeTab{
+  flex:1;
+  border:0;
+  border-radius:13px;
+  padding:10px 5px;
+  background:#edf2f3;
+  font-weight:800;
+  font-size:14px
 }
 
-.side-menu {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: min(88%, 390px);
-    background: var(--bg);
-    border-left: 1px solid var(--line);
-    padding: 18px 15px 25px;
-    overflow-y: auto;
-    animation: menuIn .2s ease;
+.modeTab.active{
+  background:#168447;
+  color:#fff
 }
 
-@keyframes menuIn {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
+.inputBox{
+  height:54px;
+  border:2px solid #e0e2e3;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  padding:0 13px;
+  margin-bottom:7px
 }
 
-.menu-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 2px 17px;
-    border-bottom: 1px solid var(--line);
+.inputBox input{
+  width:100%;
+  border:0;
+  outline:0;
+  font-size:16px
 }
 
-.menu-title {
-    font-size: 20px;
-    font-weight: 900;
+.swapBtn{
+  width:100%;
+  height:40px;
+  border:0;
+  border-radius:13px;
+  background:#edf3f5;
+  color:#237f4e;
+  font-weight:800;
+  margin-bottom:7px
 }
 
-.close {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    color: var(--text);
-    font-size: 18px;
+.findBtn{
+  width:100%;
+  height:52px;
+  border:0;
+  border-radius:16px;
+  background:#168447;
+  color:#fff;
+  font-size:15px;
+  font-weight:900
 }
 
-.menu-section {
-    color: var(--muted);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 20px 3px 8px;
+.resultArea{
+  margin-top:10px
 }
 
-.menu-item {
-    width: 100%;
-    min-height: 58px;
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    border-radius: 14px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text);
-    padding: 8px 10px;
-    margin-bottom: 4px;
-    text-align: left;
+.loading,.hint,.noResult,.resultCard{
+  border-radius:15px;
+  padding:12px;
+  font-size:14px;
+  line-height:1.45
 }
 
-.menu-item:active {
-    background: var(--card2);
-    border-color: var(--line);
+.loading{
+  background:#f1f4f5;
+  color:#687177;
+  text-align:center
 }
 
-.menu-icon {
-    width: 39px;
-    height: 39px;
-    flex: 0 0 39px;
-    border-radius: 11px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
+.hint{
+  background:#f2f6f7;
+  color:#687177;
+  margin-top:9px
 }
 
-.menu-text {
-    flex: 1;
+.noResult{
+  background:#fff0f0;
+  color:#8d4646
 }
 
-.menu-text strong {
-    display: block;
-    font-size: 13px;
+.resultCard{
+  background:#f4f7f8;
+  margin-bottom:8px
 }
 
-.menu-text span {
-    display: block;
-    color: var(--muted);
-    font-size: 10px;
-    margin-top: 3px;
+.resultCard.best{
+  background:#e8f7ed;
+  border:1px solid #b9e3c7
 }
 
-.menu-arrow {
-    color: var(--muted);
+.routeName{
+  font-size:17px;
+  font-weight:900;
+  margin-bottom:7px
 }
 
-/* MODAL */
-
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,.65);
-    align-items: flex-end;
+.routeNumber{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:42px;
+  height:30px;
+  border-radius:10px;
+  background:#168447;
+  color:#fff;
+  margin-right:5px;
+  font-size:15px
 }
 
-.modal-overlay.show {
-    display: flex;
+.routeInfo{
+  color:#50595e
 }
 
-.modal {
-    width: 100%;
-    max-height: 85vh;
-    overflow-y: auto;
-    background: var(--card);
-    border-radius: 25px 25px 0 0;
-    padding: 21px 18px 30px;
-    animation: modalUp .2s ease;
+.routeStops{
+  border-top:1px solid #dce3e0;
+  margin-top:8px;
+  padding-top:8px;
+  color:#4d5559
 }
 
-@keyframes modalUp {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
+.showRouteBtn{
+  width:100%;
+  height:41px;
+  border:0;
+  border-radius:13px;
+  background:#168447;
+  color:#fff;
+  font-weight:800;
+  margin-top:9px
 }
 
-.handle {
-    width: 40px;
-    height: 4px;
-    border-radius: 20px;
-    background: var(--line);
-    margin: 0 auto 20px;
+/* BOTTOM SHEET */
+.bottomSheet{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:52vh;
+  z-index:900;
+  background:#fff;
+  border-radius:27px 27px 0 0;
+  box-shadow:0 -5px 28px #0002;
+  transition:height .22s ease,transform .22s ease;
+  padding:0 14px
 }
 
-.modal h2 {
-    margin: 0;
-    font-size: 19px;
+.bottomSheet.collapsed{
+  height:52px
 }
 
-.modal p {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.5;
+.sheetHandle{
+  height:52px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer
 }
 
-.modal-button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 10px;
-    border-radius: 13px;
-    border: 1px solid var(--line);
-    background: var(--card2);
-    color: var(--text);
-    font-weight: 700;
+.sheetHandle span{
+  display:block;
+  width:45px;
+  height:5px;
+  background:#d5dadd;
+  border-radius:10px
 }
 
-/* TOAST */
-
-.toast {
-    position: fixed;
-    left: 50%;
-    bottom: 82px;
-    transform: translate(-50%, 20px);
-    background: var(--text);
-    color: var(--bg);
-    padding: 11px 15px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    opacity: 0;
-    pointer-events: none;
-    transition: .2s;
-    z-index: 300;
-    max-width: 90%;
-    text-align: center;
+.sheetScroll{
+  height:calc(100% - 52px);
+  overflow-y:auto;
+  padding:0 4px 25px
 }
 
-.toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
+.bottomSheet.collapsed .sheetScroll{
+  display:none
+}
+
+.bottomSheet.dragging{
+  transition:none
+}
+
+.bottomSheet.collapsed .sheetHandle span{
+  width:37px
+}
+
+.intro{
+  font-size:16px;
+  color:#697177;
+  line-height:1.35;
+  margin:2px 2px 12px
+}
+
+/* CATEGORIES */
+.categoryGrid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px
+}
+
+.category{
+  position:relative;
+  overflow:hidden;
+  min-height:92px;
+  border:0;
+  border-radius:18px;
+  background:#f1f5f7;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:8px 4px;
+  font-weight:800;
+  color:#202a30;
+  font-size:11px
+}
+
+/* НОВЫЕ ИЗОБРАЖЕНИЯ КАТЕГОРИЙ */
+.categoryImage{
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:30px;
+  height:30px;
+  border-radius:9px;
+  object-fit:cover;
+  box-shadow:0 3px 9px #0003;
+  border:2px solid rgba(255,255,255,.9);
+  z-index:1
+}
+
+.categoryIcon{
+  width:30px;
+  height:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#168447;
+  position:relative;
+  z-index:2
+}
+
+.categoryIcon svg{
+  width:27px;
+  height:27px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linecap:round;
+  stroke-linejoin:round
+}
+
+.category.marsh{
+  background:#e3f5ea;
+  color:#147d42
+}
+
+.category.marsh .categoryIcon{
+  color:#147d42;
+  font-size:27px
+}
+
+.category:active{
+  transform:scale(.97)
+}
+
+/* CITIES */
+.cities{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+  padding:12px 2px
+}
+
+.city{
+  border:0;
+  border-radius:13px;
+  background:#f1f5f7;
+  padding:10px 14px;
+  font-weight:800;
+  white-space:nowrap
+}
+
+/* LANGUAGES */
+.languagePanel{
+  position:fixed;
+  z-index:1600;
+  right:12px;
+  top:80px;
+  width:190px;
+  background:#fff;
+  border-radius:17px;
+  box-shadow:0 8px 30px #0003;
+  padding:7px;
+  display:none
+}
+
+.languagePanel.show{
+  display:block
+}
+
+.lang{
+  width:100%;
+  border:0;
+  background:#fff;
+  text-align:left;
+  padding:10px;
+  border-radius:10px
+}
+
+@media(max-width:430px){
+  .categoryGrid{
+    grid-template-columns:repeat(3,minmax(0,1fr))
+  }
+
+  .logo{
+    font-size:21px
+  }
+
+  #searchInput{
+    font-size:16px
+  }
+
+  .bottomSheet{
+    height:56vh
+  }
+
+  .category{
+    min-height:88px
+  }
+
+  .categoryImage{
+    width:28px;
+    height:28px;
+    top:5px;
+    right:5px
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header class="header">
+<div id="map"></div>
 
-    <div class="brand">
-        <div class="logo">M</div>
+<!-- SEARCH -->
+<div class="topbar">
+  <div class="searchbox">
 
-        <div>
-            <div class="brand-name">MAXA Manager</div>
-            <div class="brand-version">Android Utility</div>
-        </div>
+    <div class="logo" data-i18n="appName">
+      TAJWAY
     </div>
 
-    <button class="menu-button" onclick="openMenu()">☰</button>
-
-</header>
-
-
-<div class="search">
-    <span>⌕</span>
     <input
-        id="search"
-        type="search"
-        placeholder="Поиск файлов..."
-        oninput="searchFiles()"
+      id="searchInput"
+      type="search"
+      placeholder="Найти место в Таджикистане"
+      data-i18n-placeholder="searchPlaceholder"
     >
+
+    <button id="searchBtn" aria-label="Поиск">
+      <svg class="searchIcon svgIcon" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m20 20-4-4"></path>
+      </svg>
+    </button>
+
+  </div>
 </div>
 
+<!-- MAP BUTTONS -->
+<div class="mapButtons">
 
-<main>
+  <!-- LOCATION -->
+  <button
+    class="mapBtn"
+    onclick="locateUser()"
+    aria-label="Моё местоположение"
+  >
+    <svg class="svgIcon" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="7"></circle>
+      <circle cx="12" cy="12" r="2"></circle>
+      <path d="M12 2v3"></path>
+      <path d="M12 19v3"></path>
+      <path d="M2 12h3"></path>
+      <path d="M19 12h3"></path>
+    </svg>
+  </button>
 
-    <div class="path">
-        <strong>Внутренняя память</strong>
-        <span>/storage/emulated/0</span>
+  <!-- TRANSPORT -->
+  <button
+    class="mapBtn green"
+    onclick="openTransport()"
+    aria-label="Маршрутки"
+  >🚐</button>
+
+  <!-- LANGUAGE -->
+  <button
+    class="mapBtn"
+    onclick="toggleLanguage()"
+    aria-label="Язык"
+  >
+    <svg class="svgIcon" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M3 12h18"></path>
+      <path d="M12 3c3 3 3 15 0 18"></path>
+      <path d="M12 3c-3 3-3 15 0 18"></path>
+    </svg>
+  </button>
+
+</div>
+
+<!-- LANGUAGE PANEL -->
+<div id="languagePanel" class="languagePanel">
+
+  <button class="lang" data-lang="tg">
+    Тоҷикӣ
+  </button>
+
+  <button class="lang" data-lang="ru">
+    Русский
+  </button>
+
+  <button class="lang" data-lang="en">
+    English
+  </button>
+
+  <button class="lang" data-lang="zh">
+    中文
+  </button>
+
+  <button class="lang" data-lang="es">
+    Español
+  </button>
+
+  <button class="lang" data-lang="fr">
+    Français
+  </button>
+
+  <button class="lang" data-lang="de">
+    Deutsch
+  </button>
+
+  <button class="lang" data-lang="ar">
+    العربية
+  </button>
+
+  <button class="lang" data-lang="tr">
+    Türkçe
+  </button>
+
+</div>
+
+<!-- TRANSPORT -->
+<div id="transportPanel" class="transportPanel">
+
+  <div class="transportHeader">
+
+    <div
+      class="transportTitle"
+      data-i18n="transportTitle"
+    >
+      🚐 Найти маршрутку
     </div>
 
+    <button
+      class="closeBtn"
+      onclick="closeTransport()"
+    >
+      ×
+    </button>
 
-    <div id="fileList">
+  </div>
 
-        <div class="file">
-            <div class="file-icon">▰</div>
+  <div
+    class="transportSubtitle"
+    data-i18n="transportSubtitle"
+  >
+    Ищет не только Корвон и Гипрозем — можно вводить любое место.
+  </div>
 
-            <div class="file-info">
-                <div class="file-name">Download</div>
-                <div class="file-meta">Папка</div>
-            </div>
+  <div class="modeTabs">
 
-            <button class="file-more" onclick="showInfo('Download')">⋮</button>
-        </div>
+    <button
+      id="marshTab"
+      class="modeTab active"
+      onclick="setMode('marsh')"
+      data-i18n="marshTab"
+    >
+      🚐 Маршрутки
+    </button>
 
+    <button
+      id="carTab"
+      class="modeTab"
+      onclick="setMode('car')"
+      data-i18n="carTab"
+    >
+      <svg
+        class="svgIcon"
+        style="display:inline-block;vertical-align:middle;width:18px;height:18px"
+        viewBox="0 0 24 24"
+      >
+        <path d="M5 17h14"></path>
+        <path d="M6 17l1-6h10l1 6"></path>
+        <path d="M8 11 9.5 7h5L16 11"></path>
+        <circle cx="7" cy="17" r="1.5"></circle>
+        <circle cx="17" cy="17" r="1.5"></circle>
+      </svg>
+      Авто
+    </button>
 
-        <div class="file">
-            <div class="file-icon">▰</div>
+  </div>
 
-            <div class="file-info">
-                <div class="file-name">DCIM</div>
-                <div class="file-meta">Папка</div>
-            </div>
+  <div class="inputBox">
+    <input
+      id="fromInput"
+      placeholder="Откуда: Саховат, Корвон, Худжанд..."
+      data-i18n-placeholder="fromPlaceholder"
+    >
+  </div>
 
-            <button class="file-more" onclick="showInfo('DCIM')">⋮</button>
-        </div>
+  <button
+    class="swapBtn"
+    onclick="swapPlaces()"
+    data-i18n="swapBtn"
+  >
+    ⇅ Поменять местами
+  </button>
 
+  <div class="inputBox">
+    <input
+      id="toInput"
+      placeholder="Куда: Гипрозем, Мехргон, Сино..."
+      data-i18n-placeholder="toPlaceholder"
+    >
+  </div>
 
-        <div class="file">
-            <div class="file-icon">▰</div>
+  <button
+    class="findBtn"
+    onclick="findTransport()"
+    data-i18n="findBtn"
+  >
+    НАЙТИ МАРШРУТ
+  </button>
 
-            <div class="file-info">
-                <div class="file-name">Pictures</div>
-                <div class="file-meta">Папка</div>
-            </div>
+  <div id="resultArea"></div>
 
-            <button class="file-more" onclick="showInfo('Pictures')">⋮</button>
-        </div>
+  <div class="hint" data-i18n="hint">
+    <b>Можно писать как угодно:</b>
+    КОРВОН, корвон, Рынок Корвон, ГИПРОЗЕМГОРОДОК,
+    Саховат рынок, Мехргон и другие названия.
+  </div>
 
+</div>
 
-        <div class="file">
-            <div class="file-icon">APK</div>
+<!-- BOTTOM SHEET -->
+<div id="bottomSheet" class="bottomSheet">
 
-            <div class="file-info">
-                <div class="file-name">example.apk</div>
-                <div class="file-meta">APK • 82.4 MB</div>
-            </div>
+  <div id="sheetHandle" class="sheetHandle">
+    <span></span>
+  </div>
 
-            <button class="file-more" onclick="showInfo('example.apk')">⋮</button>
-        </div>
+  <div id="sheetScroll" class="sheetScroll">
 
+    <div class="intro" data-i18n="intro">
+      Найдите нужное место или выберите категорию.
+    </div>
 
-        <div class="file">
-            <div class="file-icon">ZIP</div>
+    <div class="categoryGrid">
 
-            <div class="file-info">
-                <div class="file-name">archive.zip</div>
-                <div class="file-meta">ZIP • 24.8 MB</div>
-            </div>
+      <!-- ДОСТОПРИМЕЧАТЕЛЬНОСТИ -->
+      <button
+        class="category"
+        onclick="showTourism('all')"
+        data-i18n="catSights"
+      >
 
-            <button class="file-more" onclick="showInfo('archive.zip')">⋮</button>
-        </div>
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
 
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="m3 19 7-10 4 5 2-3 5 8"></path>
+            <path d="M3 19h18"></path>
+          </svg>
+        </span>
 
-        <div class="file">
-            <div class="file-icon">TXT</div>
+        Достопримечательности
 
-            <div class="file-info">
-                <div class="file-name">notes.txt</div>
-                <div class="file-meta">TXT • 8 KB</div>
-            </div>
+      </button>
 
-            <button class="file-more" onclick="showInfo('notes.txt')">⋮</button>
-        </div>
+      <!-- РЕСТОРАН -->
+      <button
+        class="category"
+        onclick="loadOSM('restaurant')"
+        data-i18n="catRestaurants"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 3v8"></path>
+            <path d="M4 3v5a3 3 0 0 0 6 0V3"></path>
+            <path d="M7 11v10"></path>
+            <path d="M16 3v18"></path>
+            <path d="M16 3c4 1 4 7 0 8"></path>
+          </svg>
+        </span>
+
+        Рестораны
+
+      </button>
+
+      <!-- ОТЕЛЬ -->
+      <button
+        class="category"
+        onclick="loadOSM('hotel')"
+        data-i18n="catHotels"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 20V5h16v15"></path>
+            <path d="M4 14h16"></path>
+            <path d="M7 10h3"></path>
+            <path d="M14 10h3"></path>
+            <path d="M7 17h3"></path>
+            <path d="M14 17h3"></path>
+          </svg>
+        </span>
+
+        Отели
+
+      </button>
+
+      <!-- МАГАЗИН -->
+      <button
+        class="category"
+        onclick="loadOSM('shop')"
+        data-i18n="catShops"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 10h16v10H4z"></path>
+            <path d="M3 10 5 4h14l2 6"></path>
+            <path d="M8 14h8"></path>
+          </svg>
+        </span>
+
+        Магазины
+
+      </button>
+
+      <!-- АПТЕКА -->
+      <button
+        class="category"
+        onclick="loadOSM('pharmacy')"
+        data-i18n="catPharmacies"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5v14"></path>
+            <path d="M5 12h14"></path>
+            <rect
+              x="4"
+              y="4"
+              width="16"
+              height="16"
+              rx="3"
+            ></rect>
+          </svg>
+        </span>
+
+        Аптеки
+
+      </button>
+
+      <!-- АЗС -->
+      <button
+        class="category"
+        onclick="loadOSM('fuel')"
+        data-i18n="catFuel"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 21V4h10v17"></path>
+            <path d="M5 4h10v6H5z"></path>
+            <path d="M15 8h3l2 3v7"></path>
+            <path d="M20 18h-2"></path>
+          </svg>
+        </span>
+
+        АЗС
+
+      </button>
+
+      <!-- БОЛЬНИЦА -->
+      <button
+        class="category"
+        onclick="loadOSM('hospital')"
+        data-i18n="catHospitals"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 21V5h14v16"></path>
+            <path d="M9 9h6"></path>
+            <path d="M12 6v6"></path>
+            <path d="M3 21h18"></path>
+          </svg>
+        </span>
+
+        Больницы
+
+      </button>
+
+      <!-- МАРШРУТКИ -->
+      <button
+        class="category marsh"
+        onclick="openTransport()"
+        data-i18n="catMarsh"
+      >
+
+        <!-- 🚐 СОХРАНЁН -->
+        <span class="categoryIcon">
+          🚐
+        </span>
+
+        Маршрутки
+
+      </button>
+
+      <!-- ГОРЫ -->
+      <button
+        class="category"
+        onclick="showTourism('mountains')"
+        data-i18n="catMountains"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="m3 20 7-12 4 7 2-4 5 9"></path>
+            <path d="M10 8 12 5l2 3"></path>
+          </svg>
+        </span>
+
+        Горы
+
+      </button>
+
+      <!-- ОЗЁРА -->
+      <button
+        class="category"
+        onclick="showTourism('lakes')"
+        data-i18n="catLakes"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1439853949127-fa647821eba0?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 15c3-3 6 3 9 0s6 3 9 0"></path>
+            <path d="M3 19c3-3 6 3 9 0s6 3 9 0"></path>
+            <path d="M7 9c2-3 4-3 6 0"></path>
+          </svg>
+        </span>
+
+        Озёра
+
+      </button>
+
+      <!-- ИСТОРИЯ -->
+      <button
+        class="category"
+        onclick="showTourism('historical')"
+        data-i18n="catHistory"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1568322445389-f64ac2515020?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 20h16"></path>
+            <path d="M5 20V10h14v10"></path>
+            <path d="M3 10h18"></path>
+            <path d="m12 4 9 6H3z"></path>
+            <path d="M8 13v4"></path>
+            <path d="M12 13v4"></path>
+            <path d="M16 13v4"></path>
+          </svg>
+        </span>
+
+        История
+
+      </button>
+
+      <!-- ПРИРОДА -->
+      <button
+        class="category"
+        onclick="showTourism('nature')"
+        data-i18n="catNature"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21V10"></path>
+            <path d="M12 14c-4 0-6-2-6-6 4 0 6 2 6 6"></path>
+            <path d="M12 11c0-4 2-7 7-7 0 5-3 7-7 7"></path>
+          </svg>
+        </span>
+
+        Природа
+
+      </button>
+
+      <!-- ЛЫЖИ -->
+      <button
+        class="category"
+        onclick="showTourism('ski')"
+        data-i18n="catSki"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 5l14 14"></path>
+            <path d="M19 5 5 19"></path>
+            <path d="M3 21h18"></path>
+          </svg>
+        </span>
+
+        Лыжи
+
+      </button>
+
+      <!-- КУЛЬТУРА -->
+      <button
+        class="category"
+        onclick="showTourism('culture')"
+        data-i18n="catCulture"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1564399579883-451a5d44ec08?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 20h16"></path>
+            <path d="M6 20V8"></path>
+            <path d="M18 20V8"></path>
+            <path d="M3 8h18"></path>
+            <path d="m12 3 9 5H3z"></path>
+          </svg>
+        </span>
+
+        Культура
+
+      </button>
+
+      <!-- КРАСИВЫЕ МЕСТА -->
+      <button
+        class="category"
+        onclick="showTourism('beautiful')"
+        data-i18n="catBeautiful"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"></path>
+            <circle cx="12" cy="9" r="2.5"></circle>
+          </svg>
+        </span>
+
+        Красивые места
+
+      </button>
+
+      <!-- ЦИРК -->
+      <button
+        class="category"
+        onclick="loadOSM('circus')"
+        data-i18n="catCircus"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 20h16"></path>
+            <path d="M5 20 12 5l7 15"></path>
+            <path d="M8 13h8"></path>
+            <path d="M7 9h10"></path>
+            <path d="M9 20v-4"></path>
+            <path d="M15 20v-4"></path>
+          </svg>
+        </span>
+
+        Цирк
+
+      </button>
+
+      <!-- ПАРКИ -->
+      <button
+        class="category"
+        onclick="loadOSM('park')"
+        data-i18n="catParks"
+      >
+
+        <img
+          class="categoryImage"
+          src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=200&q=80"
+          alt=""
+        >
+
+        <span class="categoryIcon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 21V11"></path>
+            <path d="M12 14c-4 0-6-2-6-6 4 0 6 2 6 6"></path>
+            <path d="M12 12c0-4 2-7 7-7 0 5-3 7-7 7"></path>
+            <path d="M7 21h10"></path>
+          </svg>
+        </span>
+
+        Парки
+
+      </button>
 
     </div>
 
-</main>
-
-
-<!-- BOTTOM -->
-
-<div class="bottom">
-
-    <button class="active" onclick="showToast('Главная')">⌂</button>
-
-    <button onclick="showToast('Избранное')">☆</button>
-
-    <button onclick="showToast('История')">◷</button>
-
-</div>
-
-
-<!-- SIDE MENU -->
-
-<div id="overlay" class="overlay" onclick="closeMenu(event)">
-
-    <aside class="side-menu">
-
-        <div class="menu-header">
-
-            <div class="menu-title">Инструменты</div>
-
-            <button class="close" onclick="closeMenu()">×</button>
-
-        </div>
-
-
-        <div class="menu-section">APK</div>
-
-
-        <button class="menu-item" onclick="tool('Извлечь APK')">
-            <div class="menu-icon">APK</div>
-
-            <div class="menu-text">
-                <strong>Извлечь APK</strong>
-                <span>Получить APK установленного приложения</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Анализ APK')">
-            <div class="menu-icon">⌘</div>
-
-            <div class="menu-text">
-                <strong>Анализ APK</strong>
-                <span>Информация, размер, версия и структура</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Резервная копия APK')">
-            <div class="menu-icon">▣</div>
-
-            <div class="menu-text">
-                <strong>Резервная копия APK</strong>
-                <span>Сохранить APK приложения в память</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Просмотр Manifest')">
-            <div class="menu-icon">{ }</div>
-
-            <div class="menu-text">
-                <strong>AndroidManifest</strong>
-                <span>Просмотр содержимого Manifest</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Разрешения приложения')">
-            <div class="menu-icon">✓</div>
-
-            <div class="menu-text">
-                <strong>Разрешения</strong>
-                <span>Посмотреть разрешения приложения</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <div class="menu-section">Архивы</div>
-
-
-        <button class="menu-item" onclick="tool('Извлечь архив')">
-            <div class="menu-icon">↓</div>
-
-            <div class="menu-text">
-                <strong>Извлечь архив</strong>
-                <span>Распаковать ZIP и другие поддерживаемые архивы</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Создать архив')">
-            <div class="menu-icon">↑</div>
-
-            <div class="menu-text">
-                <strong>Создать архив</strong>
-                <span>Собрать файлы в ZIP</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <div class="menu-section">Файлы</div>
-
-
-        <button class="menu-item" onclick="tool('Текстовый редактор')">
-            <div class="menu-icon">T</div>
-
-            <div class="menu-text">
-                <strong>Текстовый редактор</strong>
-                <span>Открыть и редактировать текстовые файлы</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('HEX редактор')">
-            <div class="menu-icon">HEX</div>
-
-            <div class="menu-text">
-                <strong>HEX-редактор</strong>
-                <span>Просмотр бинарных данных файла</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Поиск в файлах')">
-            <div class="menu-icon">⌕</div>
-
-            <div class="menu-text">
-                <strong>Поиск в файлах</strong>
-                <span>Найти текст или файл по названию</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Информация о файле')">
-            <div class="menu-icon">i</div>
-
-            <div class="menu-text">
-                <strong>Информация о файле</strong>
-                <span>Размер, дата, путь и тип</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Хеш файла')">
-            <div class="menu-icon">#</div>
-
-            <div class="menu-text">
-                <strong>Хеш файла</strong>
-                <span>MD5, SHA-1 и SHA-256</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <div class="menu-section">Система</div>
-
-
-        <button class="menu-item" onclick="tool('Установленные приложения')">
-            <div class="menu-icon">▦</div>
-
-            <div class="menu-text">
-                <strong>Установленные приложения</strong>
-                <span>Список приложений на устройстве</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Анализ памяти')">
-            <div class="menu-icon">◫</div>
-
-            <div class="menu-text">
-                <strong>Анализ памяти</strong>
-                <span>Найти большие файлы и папки</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Очистка')">
-            <div class="menu-icon">✦</div>
-
-            <div class="menu-text">
-                <strong>Очистка</strong>
-                <span>Поиск ненужных временных файлов</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <div class="menu-section">Дополнительно</div>
-
-
-        <button class="menu-item" onclick="tool('QR генератор')">
-            <div class="menu-icon">QR</div>
-
-            <div class="menu-text">
-                <strong>QR-генератор</strong>
-                <span>Создать QR-код из текста или ссылки</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="tool('Конвертер')">
-            <div class="menu-icon">↔</div>
-
-            <div class="menu-text">
-                <strong>Конвертер</strong>
-                <span>Размеры файлов, единицы и другие расчёты</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="toggleTheme()">
-            <div class="menu-icon">◐</div>
-
-            <div class="menu-text">
-                <strong>Тема</strong>
-                <span>Изменить оформление MAXA Manager</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-
-        <button class="menu-item" onclick="showAbout()">
-            <div class="menu-icon">i</div>
-
-            <div class="menu-text">
-                <strong>О приложении</strong>
-                <span>MAXA Manager • версия 1.0</span>
-            </div>
-
-            <div class="menu-arrow">›</div>
-        </button>
-
-    </aside>
-
-</div>
-
-
-<!-- MODAL -->
-
-<div id="modal" class="modal-overlay" onclick="closeModal(event)">
-
-    <div class="modal">
-
-        <div class="handle"></div>
-
-        <h2 id="modalTitle">MAXA Manager</h2>
-
-        <p id="modalText"></p>
-
-        <button class="modal-button" onclick="closeModal()">
-            Закрыть
-        </button>
+    <div class="cities">
+
+      <button
+        class="city"
+        onclick="searchCity('Душанбе')"
+        data-i18n="cityDushanbe"
+      >
+        Душанбе
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Худжанд')"
+        data-i18n="cityKhujand"
+      >
+        Худжанд
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Бохтар')"
+        data-i18n="cityBokhtar"
+      >
+        Бохтар
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Куляб')"
+        data-i18n="cityKulyab"
+      >
+        Куляб
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Хорог')"
+        data-i18n="cityKhorog"
+      >
+        Хорог
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Турсунзаде')"
+        data-i18n="cityTursunzade"
+      >
+        Турсунзаде
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Истаравшан')"
+        data-i18n="cityIstaravshan"
+      >
+        Истаравшан
+      </button>
+
+      <button
+        class="city"
+        onclick="searchCity('Исфара')"
+        data-i18n="cityIsfara"
+      >
+        Исфара
+      </button>
 
     </div>
 
+  </div>
 </div>
 
-
-<div id="toast" class="toast"></div>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-/* MENU */
+const TJ_BBOX=[
+  [36.5,67.0],
+  [41.2,75.4]
+];
 
-function openMenu() {
-    document.getElementById("overlay").classList.add("show");
+const map=L.map("map",{
+  zoomControl:false,
+  maxBounds:TJ_BBOX,
+  maxBoundsViscosity:1,
+  minZoom:6,
+  maxZoom:19
+}).setView([38.861,71.276],7);
+
+L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom:19,
+    attribution:"© OpenStreetMap"
+  }
+).addTo(map);
+
+const markers=L.layerGroup().addTo(map);
+const routeLayer=L.layerGroup().addTo(map);
+
+let userMarker=null;
+let userAccuracy=null;
+let maskLayer=null;
+let borderLayer=null;
+let locationWatch=null;
+let locationTimer=null;
+let transportMode="marsh";
+
+/* НОРМАЛИЗАЦИЯ */
+
+function norm(s){
+  return String(s||"")
+    .toLowerCase()
+    .replace(/ё/g,"е")
+    .replace(/[«»"'.,!?;:()[\]{}]/g," ")
+    .replace(/\s+/g," ")
+    .trim();
 }
 
-function closeMenu(event) {
+function compact(s){
+  return norm(s).replace(/[\s-]/g,"")
+}
 
-    if (!event || event.target.id === "overlay") {
-        document.getElementById("overlay").classList.remove("show");
+/* АЛИАСЫ */
+
+const ALIASES={
+  "корвон":["корвон","рынок корвон","бозори корвон","корвон рынок"],
+  "гипрозем":["гипрозем","гипроземгородок","гипрозем городок","гипроземгород","гипроземский городок"],
+  "саховат":["саховат","рынок саховат","бозори саховат","саховат рынок"],
+  "мехргон":["мехргон","рынок мехргон","бозори мехргон"],
+  "сомон":["сомон","рынок сомон","бозори сомон"],
+  "пахтакор":["пахтакор","мкр пахтакор","микрорайон пахтакор"],
+  "шайнак":["шайнак","поселок шайнак","посёлок шайнак"],
+  "аэропорт":["аэропорт","аэропорт душанбе","фурудгох","фурудгоҳ"],
+  "вокзал":["вокзал","железнодорожный вокзал","жд вокзал","вокзали рохи охан"],
+  "гульбута":["гульбута","гулбута","гулбутта"],
+  "зарафшон":["зарафшон","микрорайон зарафшон","зарафшон 1","зарафшон 2"],
+  "чортут":["чортут","поселок чортут","посёлок чортут"],
+  "чортеппа":["чортеппа","поселок чортеппа","посёлок чортеппа"],
+  "чоряккорон":["чоряккорон","чоряккорон поселок","поселок чоряккорон"],
+  "терминал южный":["терминал южный","южный терминал","терминал юг"],
+  "терминал западный":["терминал западный","западный терминал"],
+  "терминал восточный":["терминал восточный","восточный терминал"],
+  "чаноро":["чаноро","поселок чаноро","посёлок чаноро"],
+  "фаровон":["фаровон","рынок фаровон","бозори фаровон"],
+  "ховарон":["ховарон","рынок ховарон","поселок ховарон","посёлок ховарон"],
+  "обшорон":["обшорон","поселок обшорон","посёлок обшорон"],
+  "ободкорон":["ободкорон","микрорайон ободкорон"],
+  "мехрабад":["мехрабад","поселок мехрабад","посёлок мехрабад"],
+  "казакон":["казакон","поселок казакон","посёлок казакон"],
+  "чорбог":["чорбог","терминал чорбог","озеро чорбог","сельсовет чорбог"],
+  "кушониён":["кушониён","рынок кушониён","бозори кушониён"],
+  "мухтороева":["мухтороева","поселок мухтороева","посёлок мухтороева"],
+  "гулпарвар":["гулпарвар","гульпарвар","поворот гулпарвар"],
+  "кахрамон":["кахрамон","поворот кахрамон","поселок кахрамон","посёлок кахрамон"],
+  "мардон":["мардон","торговый центр мардон","тц мардон"],
+  "марди худо":["марди худо","кафе марди худо"],
+  "истиклол":["истиклол","медицинский центр истиклол"],
+  "содот":["содот","торговый центр содот","тц содот"],
+  "сапеда 112":["сапеда 112","сапеда"],
+  "хайям":["хайям","парк хайям"],
+  "шохмансур":["шохмансур","рынок шохмансур"],
+  "европа":["европа","торговый центр европа","тц европа"],
+  "китайский рынок":["китайский рынок","китайский базар","бозори хитой"],
+  "фучика":["фучика","улица фучика","мирзо махмадали"],
+  "масложиркомбинат":["масложиркомбинат","масложиркомбинат платформа"],
+  "мадад":["мадад","рынок мадад","торговый центр мадад"],
+  "фирдоуси":["фирдоуси","улица фирдоуси","парк фирдоуси"],
+  "цирк":["госцирк","цирк","сирк"],
+  "сино":["сино","район сино"],
+  "испечак":["испечак","испечак 1","испечак 2"]
+};
+
+function canonical(q){
+
+  const n=norm(q);
+
+  for(const k in ALIASES){
+
+    for(const a of ALIASES[k]){
+
+      const aa=norm(a);
+
+      if(
+        n===aa ||
+        compact(n)===compact(aa) ||
+        n.includes(aa) ||
+        aa.includes(n)
+      ){
+        return k;
+      }
     }
+  }
+
+  return n;
 }
 
+function placeMatch(q,name){
 
-/* TOOLS */
+  const a=canonical(q);
+  const b=canonical(name);
 
-function tool(name) {
+  if(a===b)return true;
 
-    closeMenu();
+  const nq=norm(q);
+  const nn=norm(name);
 
-    document.getElementById("modalTitle").textContent = name;
-
-    document.getElementById("modalText").textContent =
-        "Интерфейс функции готов. На этапе AndroidIDE эта функция будет подключена к Kotlin и получит настоящий доступ к Android.";
-
-    document.getElementById("modal").classList.add("show");
+  return nq===nn ||
+    compact(nq)===compact(nn) ||
+    nn.includes(nq) ||
+    nq.includes(nn);
 }
 
+/* ПОИСК ПО ТАДЖИКИСТАНУ */
 
-/* FILE INFO */
+async function geocode(q){
 
-function showInfo(name) {
+  const u=
+    "https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=tj&accept-language=ru&q="+
+    encodeURIComponent(q+", Tajikistan");
 
-    document.getElementById("modalTitle").textContent = name;
-
-    document.getElementById("modalText").textContent =
-        "Подробная информация о файле будет получена через Kotlin после переноса MAXA Manager в AndroidIDE.";
-
-    document.getElementById("modal").classList.add("show");
-}
-
-
-/* ABOUT */
-
-function showAbout() {
-
-    closeMenu();
-
-    document.getElementById("modalTitle").textContent = "MAXA Manager";
-
-    document.getElementById("modalText").textContent =
-        "Универсальный Android-менеджер. Версия интерфейса 1.0.";
-
-    document.getElementById("modal").classList.add("show");
-}
-
-
-/* MODAL CLOSE */
-
-function closeModal(event) {
-
-    if (!event || event.target.id === "modal") {
-        document.getElementById("modal").classList.remove("show");
+  const r=await fetch(u,{
+    headers:{
+      "Accept-Language":"ru"
     }
+  });
+
+  const d=await r.json();
+
+  return d.map(x=>({
+    lat:+x.lat,
+    lon:+x.lon,
+    name:x.display_name
+  }));
 }
 
-
-/* TOAST */
-
-function showToast(text) {
-
-    const toast = document.getElementById("toast");
-
-    toast.textContent = text;
-    toast.classList.add("show");
-
-    clearTimeout(window.toastTimer);
-
-    window.toastTimer = setTimeout(function() {
-        toast.classList.remove("show");
-    }, 1800);
+async function geocodeOne(q){
+  const d=await geocode(q);
+  return d[0]||null;
 }
 
+/* ТОЛЬКО ТАДЖИКИСТАН НА КАРТЕ */
 
-/* SEARCH */
+async function loadTJ(){
 
-function searchFiles() {
+  try{
 
-    const query = document
-        .getElementById("search")
-        .value
-        .toLowerCase()
-        .trim();
+    const u=
+      "https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&limit=1&countrycodes=tj&q=Tajikistan";
 
-    const files = document.querySelectorAll(".file");
+    const r=await fetch(u,{
+      headers:{
+        "Accept-Language":"ru"
+      }
+    });
 
-    files.forEach(function(file) {
+    const d=await r.json();
 
-        const text = file.textContent.toLowerCase();
+    if(!d[0])return;
 
-        file.style.display =
-            text.includes(query) ? "flex" : "none";
+    const g=d[0].geojson;
+
+    borderLayer=L.geoJSON(g,{
+      style:{
+        color:"#168447",
+        weight:3,
+        fill:false
+      }
+    }).addTo(map);
+
+    let holes=[];
+
+    if(g.type==="Polygon"){
+      holes=[
+        g.coordinates[0].map(c=>[c[1],c[0]])
+      ];
+    }
+
+    if(g.type==="MultiPolygon"){
+      g.coordinates.forEach(p=>{
+        if(p[0]){
+          holes.push(
+            p[0].map(c=>[c[1],c[0]])
+          );
+        }
+      });
+    }
+
+    if(holes.length){
+
+      const world=[
+        [-89.9,-179.9],
+        [-89.9,179.9],
+        [89.9,179.9],
+        [89.9,-179.9]
+      ];
+
+      maskLayer=L.polygon(
+        [world,...holes],
+        {
+          stroke:false,
+          fillColor:"#f4f7f8",
+          fillOpacity:.94,
+          interactive:false
+        }
+      ).addTo(map);
+
+      maskLayer.bringToBack();
+      borderLayer.bringToFront();
+    }
+
+  }catch(e){
+    console.log("TJ boundary:",e);
+  }
+}
+
+/* МАРШРУТЫ */
+
+const MARSH_REFS=new Set([
+  "1","2","3","4","5","6","7","8","10","11","14",
+  "15","16","17","19","25","28","33","42","46",
+  "52","54","56","58","81","88","108","279"
+]);
+
+async function nearbyRouteRelations(p){
+
+  const q=`[out:json][timeout:25];(
+    node(around:2500,${p.lat},${p.lon})["highway"="bus_stop"];
+    node(around:2500,${p.lat},${p.lon})["public_transport"="platform"];
+    node(around:2500,${p.lat},${p.lon})["public_transport"="stop_position"];
+  );rel(bn)["type"="route"];out tags qt;`;
+
+  const r=await fetch(
+    "https://overpass-api.de/api/interpreter",
+    {
+      method:"POST",
+      body:q
+    }
+  );
+
+  const d=await r.json();
+
+  return d.elements.filter(x=>{
+
+    const ref=String(x.tags?.ref||"").trim();
+    const name=norm(x.tags?.name||"");
+    const rt=norm(x.tags?.route||"");
+
+    return MARSH_REFS.has(ref) ||
+      name.includes("маршрут") ||
+      rt==="minibus" ||
+      rt==="share taxi";
+  });
+}
+
+function routeKey(r){
+  return String(
+    r.tags?.ref ||
+    r.tags?.name ||
+    r.id
+  ).toLowerCase().trim();
+}
+
+function routeLabel(r){
+  return r.tags?.ref
+    ? "№"+r.tags.ref
+    : (r.tags?.name||"Маршрут");
+}
+
+function routeType(r){
+
+  const t=norm(r.tags?.route||"");
+
+  return (
+    t==="share taxi" ||
+    t==="minibus" ||
+    MARSH_REFS.has(
+      String(r.tags?.ref||"")
+    )
+  )
+  ? "Маршрутка"
+  : "Общественный транспорт";
+}
+
+async function dynamicRoutes(a,b){
+
+  const [ra,rb]=await Promise.all([
+    nearbyRouteRelations(a),
+    nearbyRouteRelations(b)
+  ]);
+
+  const bm=new Map(
+    rb.map(x=>[routeKey(x),x])
+  );
+
+  const common=[];
+
+  ra.forEach(x=>{
+    const y=bm.get(routeKey(x));
+    if(y)common.push(x);
+  });
+
+  return common;
+}
+
+/* БАЗА МАРШРУТОВ */
+
+const FALLBACK=[
+
+{
+ref:"1",
+title:"Терминал Южный ↔ посёлок Южный",
+fare:"2.50 сомони",
+time:"05:30–21:46",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Южный","Кахрамон","Гулпарвар",
+"Корвон","Касымова","63-й микрорайон",
+"61-й микрорайон","46-й микрорайон",
+"Истиклол","Высшая школа","Абая",
+"Фирдоуси","Саховат","65-й микрорайон",
+"Корвон","Чимтеппа","Терминал Южный"
+]
+},
+
+{
+ref:"2",
+title:"Пахтакор ↔ рынок Мехргон",
+fare:"2.50 сомони",
+time:"05:30–22:19",
+interval:"каждые ~15 мин",
+stops:[
+"Пахтакор","Сомон","Гипрозем",
+"Финансово-экономический университет",
+"Марди худо","Школа №99","Мардон",
+"Институт искусств","ДСК","Школа №38",
+"1-й Советский","Экскаваторный ремонтный завод",
+"Ресторан Океан","33-й микрорайон",
+"32-й микрорайон","Маяковского",
+"Якка-Чинарская","Госцирк","Таджиктекстиль",
+"Школа №52","Таджикпечать",
+"Телефонная горсеть","Сквер Хафиза Шерози",
+"Ашан","Винзавод","Пивзавод",
+"Поликлиника №6","Мехргон"
+]
+},
+
+{
+ref:"3",
+title:"Рынок Корвон ↔ Зарафшон",
+fare:"2.50 сомони",
+time:"05:30–22:00",
+interval:"каждые ~10 мин",
+stops:[
+"Корвон","65-й микрорайон","Саховат",
+"Фирдоуси","Абая","Высшая школа",
+"Истиклол","46-й микрорайон","61-й микрорайон",
+"Госцирк","Маяковского","32-й микрорайон",
+"33-й микрорайон","84-й микрорайон",
+"101-й микрорайон","102-й микрорайон",
+"Испечак-1","121-й микрорайон","Зарафшон"
+]
+},
+
+{
+ref:"4",
+title:"Терминал Западный ↔ Вадон",
+fare:"2.50 сомони",
+time:"06:00–21:30",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Западный","Зарафшон","102-й микрорайон",
+"84-й микрорайон","Автовокзал","Госцирк",
+"Университет","Пединститут","Вадон"
+]
+},
+
+{
+ref:"5",
+title:"Терминал Восточный ↔ Терминал Южный",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Восточный","Обшорон",
+"191-й микрорайон","Полиграфкомбинат",
+"Автодром","7 км","Школа №29",
+"Ховарон","Зебуниссо","Поликлиника №3",
+"Жилмассив","Автобаза №3",
+"Дружбы народов","Европа","Аэропорт",
+"Карин Манн","Китайский рынок","Фучика",
+"Мясокомбинат","Истиклол","46-й микрорайон",
+"61-й микрорайон","63-й микрорайон",
+"Касымова","Корвон","Чимтеппа",
+"Терминал Южный"
+]
+},
+
+{
+ref:"6",
+title:"Зарафшон-2 ↔ Пахтакор",
+fare:"2.50 сомони",
+time:"07:00–20:00",
+interval:"каждые ~20 мин",
+stops:[
+"Зарафшон-2","121-й микрорайон",
+"Испечак-1","102-й микрорайон",
+"Родильный дом №3","101-й микрорайон",
+"103-й микрорайон","84-й микрорайон",
+"Масложиркомбинат","Фаровон","ГАИ",
+"Дилкушо","Троллейбусное депо №2",
+"Таджиквторчермет","Арматурный завод",
+"Мадад","Мардон","Школа №99",
+"Марди худо","Гипрозем","Сомон","Пахтакор"
+]
+},
+
+{
+ref:"7",
+title:"Чортут ↔ торговый центр Европа",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~15 мин",
+stops:[
+"Чортут","Спортивный комплекс",
+"73-й микрорайон","Медицинский колледж",
+"Глазная больница","Мебельная фабрика Акрам",
+"33-й микрорайон","32-й микрорайон",
+"Маяковского","Якка-Чинарская",
+"Госцирк","Таджиктекстиль",
+"Карин Манн","Школа №16",
+"Аэропорт","Шёлковый путь",
+"Европа","Железнодорожный вокзал",
+"Площадь Победы","Школа №19"
+]
+},
+
+{
+ref:"8",
+title:"Терминал Западный ↔ улица Сафо",
+fare:"2.50 сомони",
+time:"05:30–22:30",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Западный","Чоряккорон",
+"Зарафшон-2","117-й микрорайон",
+"Испечак-2","114-й микрорайон",
+"112-й микрорайон","Райхон",
+"Западная энергетическая зона",
+"Музей","Бобо Хамдамова","Зафар",
+"Чайхана Абдуллох","улица Сафо"
+]
+},
+
+{
+ref:"10",
+title:"Вокзал ↔ Зарафшон",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~12 мин",
+stops:[
+"Вокзал","Площадь Победы","Аэропорт",
+"Пединститут","Госцирк","Автовокзал",
+"84-й микрорайон","101-й микрорайон",
+"Зарафшон"
+]
+},
+
+{
+ref:"11",
+title:"Арбоб-Хотун ↔ улица Истравшан",
+fare:"2.50 сомони",
+time:"05:30–22:00",
+interval:"каждые ~15 мин",
+stops:[
+"Арбоб-Хотун","Политехнический колледж",
+"Мадад","Мардон","Парк Фирдоуси",
+"Содот","46-й микрорайон","Истиклол",
+"Высшая школа","Школа №72",
+"Шарки Озод","Таджиктекстиль",
+"улица Истравшан"
+]
+},
+
+{
+ref:"14",
+title:"Пахтакор ↔ посёлок Чаноро",
+fare:"2.50 сомони",
+time:"05:30–22:03",
+interval:"каждые ~15 мин",
+stops:[
+"Пахтакор","Сомон","Гипрозем",
+"Финансово-экономический университет",
+"Марди худо","Школа №99",
+"Математический колледж","Парк Фирдоуси",
+"Содот","46-й микрорайон","Истиклол",
+"Высшая школа","Школа №72",
+"Шарки Озод","Таджиктекстиль",
+"Бинокорон","Чаноро"
+]
+},
+
+{
+ref:"15",
+title:"Ободкорон ↔ Ховарон",
+fare:"2.50 сомони",
+time:"06:00–20:00",
+interval:"каждые ~10 мин",
+stops:[
+"Ободкорон","Гуломова","84-й микрорайон",
+"103-й микрорайон","Шамси","Филиал ТГМУ",
+"Автовокзал","13-й микрорайон",
+"Поликлиника №2","12-й микрорайон",
+"11-й микрорайон","Ёвар","СТО Москвич",
+"Таджиктекстиль","Школа №19",
+"Площадь Победы","Железнодорожный вокзал",
+"Автовокзал","Ховарон"
+]
+},
+
+{
+ref:"16",
+title:"Чортеппа ↔ Чаноро",
+fare:"2.50 сомони",
+time:"05:30–22:18",
+interval:"каждые ~10 мин",
+stops:[
+"Чортеппа","Фаровон","Масложиркомбинат",
+"Маяковского","ЖК Армения",
+"Госфилармония","Автовокзал",
+"Химчистка","Хаёти нав","Автобаза №2",
+"Союз писателей","ТЦ Таджикистан",
+"Стадион Спартак","Славянский университет",
+"Чаноро"
+]
+},
+
+{
+ref:"17",
+title:"Ободкорон ↔ улица Гагарина",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~20 мин",
+stops:[
+"Ободкорон","Гуломова","84-й микрорайон",
+"103-й микрорайон","Шамси",
+"Налоговое управление","Школа искусств",
+"Филиал ТГМУ","Автовокзал",
+"88-й микрорайон","84-й микрорайон",
+"Масложиркомбинат",
+"Министерство энергетики","Казакон",
+"Мехрабад","улица Гагарина"
+]
+},
+
+{
+ref:"19",
+title:"Пахтакор ↔ Терминал Чорбог",
+fare:"2.50 сомони",
+time:"05:30–22:18",
+interval:"каждые ~10 мин",
+stops:[
+"Пахтакор","Сомон","Гипрозем",
+"Финансово-экономический университет",
+"Марди худо","Школа №99","Мардон",
+"Институт искусств","ДСК","Школа №38",
+"1-й Советский","Экскаваторный ремонтный завод",
+"Ресторан Океан","Чагатай",
+"Мухтороева","Чорбог"
+]
+},
+
+{
+ref:"25",
+title:"Терминал Западный ↔ рынок Мехргон",
+fare:"2.50 сомони",
+time:"05:30–22:00",
+interval:"каждые ~20 мин",
+stops:[
+"Терминал Западный","Чоряккорон",
+"Зарафшон-2","117-й микрорайон",
+"Испечак-2","112-й микрорайон",
+"Шамси","101-й микрорайон",
+"Казакон","Хамадони",
+"Северо-западная производственная зона",
+"Западная энергетическая зона",
+"Музей","Бобо Хамдамова","Зафар",
+"Чайхана Абдуллох","Мехргон"
+]
+},
+
+{
+ref:"28",
+title:"Рынок Корвон ↔ Терминал Чорбог",
+fare:"2.50 сомони",
+time:"05:30–22:00",
+interval:"каждые ~10 мин",
+stops:[
+"Корвон","65-й микрорайон","Саховат",
+"Сиёма","Институт искусств","Мардон",
+"Автовокзал","Госцирк","Таджиктекстиль",
+"Пединститут","Парк Хайям","Чорбог"
+]
+},
+
+{
+ref:"33",
+title:"Гипрозем ↔ Аэропорт",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~12 мин",
+stops:[
+"Гипрозем","Сомон","Саховат",
+"61-й микрорайон","46-й микрорайон",
+"Истиклол","Вокзал","Аэропорт"
+]
+},
+
+{
+ref:"42",
+title:"Терминал Южный ↔ Чоряккорон",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Южный","Кахрамон","Гулпарвар",
+"Корвон","Касымова","63-й микрорайон",
+"Фирдоуси","Саховат","Сиёма",
+"Институт искусств","Школа №99","Мардон",
+"Хамадони","Северо-западная производственная зона",
+"Западная энергетическая зона","Музей",
+"Бобо Хамдамова","Зафар",
+"Чайхана Абдуллох","Чоряккорон"
+]
+},
+
+{
+ref:"46",
+title:"Терминал Западный ↔ терминал ЧСП",
+fare:"2.50 сомони",
+time:"05:30–21:06",
+interval:"каждые ~20 мин",
+stops:[
+"Терминал Западный","Чоряккорон",
+"Зарафшон-2","117-й микрорайон",
+"Испечак-2","114-й микрорайон",
+"112-й микрорайон",
+"Западная энергетическая зона",
+"Музей","Бобо Хамдамова","Зафар",
+"Чайхана Абдуллох","Чоряккорон"
+]
+},
+
+{
+ref:"52",
+title:"Терминал Чорбог ↔ Терминал Южный",
+fare:"2.50 сомони",
+time:"05:30–22:21",
+interval:"каждые ~15 мин",
+stops:[
+"Терминал Чорбог","Чорбог","Мухтороева",
+"Чагатай","Кушониён","Шафак",
+"ТЭЦ №2","Парк Хайям",
+"Центральная Соборная мечеть",
+"Корвон","Кахрамон","Гулпарвар",
+"Чимтеппа","Терминал Южный"
+]
+},
+
+{
+ref:"54",
+title:"Дарьяабад ↔ Институт физкультуры",
+fare:"2.50 сомони",
+time:"05:30–21:56",
+interval:"каждые ~20 мин",
+stops:[
+"Дарьяабад","Хосилот","Чимтеппа",
+"Гулпарвар","Гипрозем",
+"Финансово-экономический университет",
+"Марди худо","Институт искусств",
+"Сиёма","Истиклол","61-й микрорайон",
+"46-й микрорайон","Шарки Озод"
+]
+},
+
+{
+ref:"56",
+title:"Шайнак ↔ Терминал Южный",
+fare:"2.50 сомони",
+time:"05:00–22:28",
+interval:"каждые ~15 мин",
+stops:[
+"Шайнак","Пахтакор","Сомон",
+"Гипрозем",
+"Финансово-экономический университет",
+"Институт искусств","65-й микрорайон",
+"Корвон","Гулпарвар","Кахрамон",
+"Чимтеппа","Терминал Южный"
+]
+},
+
+{
+ref:"58",
+title:"Зарафшон ↔ Рынок Мехргон",
+fare:"2.50 сомони",
+time:"06:00–22:00",
+interval:"каждые ~15 мин",
+stops:[
+"Зарафшон","102-й микрорайон","84-й микрорайон",
+"Маяковского","Госцирк","Ашан","Мехргон"
+]
+},
+
+{
+ref:"81",
+title:"Рынок Корвон ↔ 102-й микрорайон",
+fare:"2.50 сомони",
+time:"06:00–21:30",
+interval:"каждые ~12 мин",
+stops:[
+"Корвон","Саховат","Гипрозем","Мардон",
+"Автовокзал","84-й микрорайон",
+"101-й микрорайон","102-й микрорайон"
+]
+},
+
+{
+ref:"88",
+title:"Фармацевтический госконтроль ↔ Терминал Южный",
+fare:"2.50 сомони",
+time:"05:00–22:12",
+interval:"каждые ~15 мин",
+stops:[
+"Фармацевтический госконтроль","Карамова",
+"Мехрабад","Международная школа",
+"Райхон","Сапеда 112","Казакон",
+"101-й микрорайон","103-й микрорайон",
+"84-й микрорайон","Масложиркомбинат",
+"Кахрамон","Чимтеппа","Терминал Южный",
+"Гульбута","Сомон Сервис",
+"63-й микрорайон","Саховат","Сиёма",
+"Институт искусств","Школа №99",
+"Сапеда 112"
+]
+},
+
+{
+ref:"108",
+title:"Зарафшон ↔ Рынок Кушониён",
+fare:"2.50 сомони",
+time:"06:00–21:30",
+interval:"каждые ~15 мин",
+stops:[
+"Зарафшон","Испечак-2","102-й микрорайон",
+"Казакон","Парк Хайям","Кушониён"
+]
+},
+
+{
+ref:"279",
+title:"Холодильный завод ↔ посёлок Шарора",
+fare:"уточняется",
+time:"ежедневно",
+interval:"по расписанию",
+stops:[
+"Холодильный завод",
+"Чортут",
+"Чортут 1",
+"По требованию",
+"Шарора"
+]
+}
+
+];
+
+const ROUTE_DIRECTORY=[
+  "1","2","3","4","5","6","7","8","10","11","14","15",
+  "16","17","19","25","28","33","42","46","52","54",
+  "56","58","81","88","108","279"
+];
+
+/* ХУДЖАНД */
+
+const KHUJAND_FALLBACK=[
+
+{
+ref:"2",
+city:"Худжанд",
+title:"Школа №3 ↔ Панчшанбе",
+fare:"2 сомони",
+time:"07:00–19:00",
+interval:"каждые ~20 мин",
+stops:[
+"Школа №3","Сулаймонова","Пахтакор",
+"Автовокзал","ГОРОНО","Ватан",
+"Гимназия №4","Детская поликлиника",
+"Национальный банк","Налоговый комитет",
+"Детская больница","Авторемонтный завод",
+"Гулистон","Панчшанбе"
+]
+},
+
+{
+ref:"27a",
+city:"Худжанд",
+title:"13-й микрорайон ↔ Панчшанбе",
+fare:"2 сомони",
+time:"07:00–19:00",
+interval:"каждые ~15 мин",
+stops:[
+"13-й микрорайон","Мевагул",
+"Парк Победы","18-й микрорайон",
+"19-й микрорайон","Сквер Исмоил Сомони",
+"Площадь Камола Худжанди",
+"Детская поликлиника","Детская больница",
+"Авторемонтный завод","Гулистон","Панчшанбе"
+]
+},
+
+{
+ref:"28",
+city:"Худжанд",
+title:"Галамайдон ↔ 12-й микрорайон",
+fare:"2 сомони",
+time:"06:00–21:00",
+interval:"каждые ~10 мин",
+stops:[
+"Галамайдон","Сартукай","Хаёти нав",
+"Ява","ЗАГС","Электроника",
+"Пахтакор","Автовокзал","ГОРОНО",
+"Ватан","Гимназия №4",
+"Площадь Камола Худжанди",
+"Сквер Исмоил Сомони",
+"19-й микрорайон","18-й микрорайон",
+"Парк Победы","Мевагул",
+"Инфекционная больница","Навбахор",
+"Хусноро","12-й микрорайон"
+]
+},
+
+{
+ref:"29a",
+city:"Худжанд",
+title:"Школа №3 ↔ Областная больница",
+fare:"2 сомони",
+time:"06:00–20:00",
+interval:"каждые ~13 мин",
+stops:[
+"Школа №3","Сулаймонова","Пахтакор",
+"Автовокзал","ГОРОНО","Ватан",
+"Гимназия №4","Площадь Камола Худжанди",
+"Мира","Толстого","Руставели",
+"Ягодка","60 лет Победы",
+"Ботанический сад","Чумчук-Арал",
+"Школа №21","34-й микрорайон",
+"Навбахор","Областная больница"
+]
+},
+
+{
+ref:"33",
+city:"Худжанд",
+title:"Чуҷахона ↔ Областная больница",
+fare:"от 2 сомони",
+time:"06:00–20:00",
+interval:"каждые ~15 мин",
+stops:[
+"Чуҷахона","Пахтакор","Автовокзал",
+"ГОРОНО","Ватан","Гимназия №4",
+"Площадь Камола Худжанди",
+"Хукумат области","Городской хукумат",
+"ЗАГС","Президентский детский сад",
+"Кардиология","Новый мост",
+"Ботанический сад","Чумчук-Арал",
+"Школа №21","34-й микрорайон",
+"Навбахор","Областная больница"
+]
+},
+
+{
+ref:"57",
+city:"Худжанд",
+title:"Школа №3 ↔ 12-й микрорайон",
+fare:"2 сомони",
+time:"07:00–19:00",
+interval:"каждые ~20 мин",
+stops:[
+"Школа №3","Сулаймонова","Пахтакор",
+"Автовокзал","ГОРОНО","Ватан",
+"Гимназия №4","Площадь Камола Худжанди",
+"Сквер Исмоил Сомони",
+"19-й микрорайон","18-й микрорайон",
+"Парк Победы","Мевагул",
+"Инфекционная больница","Сады",
+"8-12 микрорайоны","Навбахор",
+"Хусноро","12-й микрорайон"
+]
+}
+
+];
+
+function isKhujand(a,b){
+
+  const x=norm(
+    (a?.name||"")+" "+
+    (b?.name||"")
+  );
+
+  return x.includes("худжанд") ||
+    x.includes("khujand") ||
+    x.includes("хучанд");
+}
+
+function fallbackDirect(from,to){
+
+  const pool=
+    window.__routeCity==="khujand"
+      ? KHUJAND_FALLBACK
+      : FALLBACK;
+
+  const out=[];
+
+  for(const r of pool){
+
+    let i=-1;
+    let j=-1;
+
+    r.stops.forEach((st,k)=>{
+
+      if(i<0 && placeMatch(from,st))
+        i=k;
+
+      if(j<0 && placeMatch(to,st))
+        j=k;
 
     });
+
+    if(i>=0 && j>=0 && i!==j)
+      out.push({r,i,j});
+  }
+
+  return out;
 }
 
+/* OSM ROUTE */
 
-/* THEME */
+async function showOSMRoute(id,a,b){
 
-function toggleTheme() {
+  routeLayer.clearLayers();
 
-    document.body.classList.toggle("light");
+  const q=
+    `[out:json][timeout:20];relation(${id});way(r);out geom qt;`;
 
-    if (document.body.classList.contains("light")) {
-        localStorage.setItem("maxa_theme", "light");
-        showToast("Светлая тема");
-    } else {
-        localStorage.setItem("maxa_theme", "dark");
-        showToast("Тёмная тема");
+  try{
+
+    const d=await(
+      await fetch(
+        "https://overpass-api.de/api/interpreter",
+        {
+          method:"POST",
+          body:q
+        }
+      )
+    ).json();
+
+    const lines=[];
+
+    d.elements
+      .filter(x=>x.type==="way"&&x.geometry)
+      .forEach(w=>{
+        lines.push(
+          w.geometry.map(p=>[p.lat,p.lon])
+        );
+      });
+
+    lines.forEach(line=>{
+      L.polyline(
+        line,
+        {
+          color:"#168447",
+          weight:5,
+          opacity:.8
+        }
+      ).addTo(routeLayer);
+    });
+
+  }catch(e){}
+
+  addEndpointMarkers(a,b);
+}
+
+function addEndpointMarkers(a,b){
+
+  const icon=L.divIcon({
+    className:"",
+    html:
+      "<div style='width:18px;height:18px;border-radius:50%;background:#168447;border:3px solid white;box-shadow:0 2px 8px #0005'></div>",
+    iconSize:[18,18],
+    iconAnchor:[9,9]
+  });
+
+  L.marker([a.lat,a.lon],{icon})
+    .bindPopup("Откуда")
+    .addTo(routeLayer);
+
+  L.marker([b.lat,b.lon],{icon})
+    .bindPopup("Куда")
+    .addTo(routeLayer);
+
+  map.fitBounds(
+    [
+      [a.lat,a.lon],
+      [b.lat,b.lon]
+    ],
+    {
+      padding:[80,80]
     }
+  );
 }
 
+/* ПОИСК МАРШРУТКИ */
 
-/* LOAD THEME */
+async function searchMarsh(from,to){
 
-if (localStorage.getItem("maxa_theme") === "light") {
-    document.body.classList.add("light");
-}
+  const result=document.getElementById("resultArea");
 
+  result.innerHTML=
+    "<div class='loading'>Ищу маршрутки рядом с обеими точками…</div>";
 
-/* ESC */
+  try{
 
-document.addEventListener("keydown", function(event) {
+    const [a,b]=await Promise.all([
+      geocodeOne(from),
+      geocodeOne(to)
+    ]);
 
-    if (event.key === "Escape") {
-        closeMenu();
-        closeModal();
+    if(!a||!b){
+
+      result.innerHTML=
+        "<div class='noResult'><b>Не удалось найти одну из точек.</b><br>Добавь город/район/улицу, например: «Саховат, Душанбе».</div>";
+
+      return;
     }
 
-});
+    window.__routeCity=
+      isKhujand(a,b)
+        ? "khujand"
+        : "dushanbe";
+
+    const [dynamic,fb]=await Promise.all([
+      dynamicRoutes(a,b).catch(()=>[]),
+      Promise.resolve(
+        fallbackDirect(from,to)
+      )
+    ]);
+
+    let html="";
+    const seen=new Set();
+
+    if(fb.length){
+
+      html+=
+        "<div class='resultCard best'>"+
+        "<div class='routeName'>Найдено прямых маршруток: "+fb.length+"</div>"+
+        "<div class='routeInfo'>Обе точки находятся на остановках/участках одной линии.</div>"+
+        "</div>";
+
+      fb.forEach(x=>{
+
+        if(seen.has(x.r.ref))return;
+
+        seen.add(x.r.ref);
+
+        const lo=Math.min(x.i,x.j);
+        const hi=Math.max(x.i,x.j);
+
+        html+=
+          `<div class="resultCard">
+
+            <div class="routeName">
+              <span class="routeNumber">№${x.r.ref}</span>
+              Маршрутка
+            </div>
+
+            <div class="routeInfo">
+              <b>${x.r.title}</b><br>
+              🕐 ${x.r.time}<br>
+              🔄 ${x.r.interval}<br>
+              💰 ${x.r.fare}
+            </div>
+
+            <div class="routeStops">
+              <b>Ваш участок:</b><br>
+              ${x.r.stops.slice(lo,hi+1).join(" → ")}
+            </div>
+
+            <button
+              class="showRouteBtn"
+              onclick='showFallback(${JSON.stringify(x.r)},${JSON.stringify(a)},${JSON.stringify(b)})'
+            >
+              ПОКАЗАТЬ НА КАРТЕ
+            </button>
+
+          </div>`;
+      });
+    }
+
+    if(dynamic.length){
+
+      const fresh=
+        dynamic.filter(
+          r=>!seen.has(
+            String(r.tags?.ref||"")
+          )
+        );
+
+      if(fresh.length){
+
+        html+=
+          "<div class='resultCard best'>"+
+          "<div class='routeName'>Также найдены линии на карте</div>"+
+          "<div class='routeInfo'>Остановки и маршрутные линии получены из OpenStreetMap.</div>"+
+          "</div>";
+      }
+
+      fresh.slice(0,10).forEach(r=>{
+
+        seen.add(
+          String(
+            r.tags?.ref||r.id
+          )
+        );
+
+        html+=
+          `<div class="resultCard">
+
+            <div class="routeName">
+              <span class="routeNumber">${routeLabel(r)}</span>
+              ${routeType(r)}
+            </div>
+
+            <div class="routeInfo">
+              <b>${r.tags?.name||"Маршрут"}</b>
+              ${r.tags?.operator
+                ? "<br>Перевозчик: "+r.tags.operator
+                : ""}
+            </div>
+
+            <button
+              class="showRouteBtn"
+              onclick="showOSMRoute(${r.id},${JSON.stringify(a)},${JSON.stringify(b)})"
+            >
+              ПОКАЗАТЬ НА КАРТЕ
+            </button>
+
+          </div>`;
+      });
+    }
+
+    if(!html){
+
+      html=
+        `<div class="noResult">
+
+          <b>Прямой маршрут не найден.</b><br><br>
+
+          Но база TAJWAY содержит маршруты Душанбе и отдельную базу Худжанда.
+
+          Для Душанбе загружены ключевые номера:
+
+          ${ROUTE_DIRECTORY.join(", ")}.
+
+          <br><br>
+
+          Попробуй ближайшую остановку или добавь «Душанбе» к названию.
+
+        </div>`;
+    }
+
+    result.innerHTML=html;
+
+  }catch(e){
+
+    result.innerHTML=
+      "<div class='noResult'><b>Сервис маршрутов временно не ответил.</b><br>Повтори поиск через несколько секунд.</div>";
+  }
+}
+
+function showFallback(r,a,b){
+
+  routeLayer.clearLayers();
+
+  addEndpointMarkers(a,b);
+
+  closeTransport();
+}
+
+/* АВТО */
+
+async function carRoute(from,to){
+
+  const result=document.getElementById("resultArea");
+
+  result.innerHTML=
+    "<div class='loading'>Строю автомобильный маршрут…</div>";
+
+  const [a,b]=await Promise.all([
+    geocodeOne(from),
+    geocodeOne(to)
+  ]);
+
+  if(!a||!b){
+
+    result.innerHTML=
+      "<div class='noResult'>Не удалось найти одну из точек в Таджикистане.</div>";
+
+    return;
+  }
+
+  try{
+
+    const u=
+      `https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=full&geometries=geojson`;
+
+    const d=await(
+      await fetch(u)
+    ).json();
+
+    if(!d.routes?.length)
+      throw Error();
+
+    routeLayer.clearLayers();
+
+    const line=
+      d.routes[0]
+        .geometry
+        .coordinates
+        .map(c=>[c[1],c[0]]);
+
+    const l=L.polyline(
+      line,
+      {
+        color:"#168447",
+        weight:6
+      }
+    ).addTo(routeLayer);
+
+    map.fitBounds(
+      l.getBounds(),
+      {
+        padding:[70,70]
+      }
+    );
+
+    result.innerHTML=
+      `<div class="resultCard best">
+
+        <div class="routeName">
+          Автомаршрут
+        </div>
+
+        <div class="routeInfo">
+
+          <b>${from}</b> → <b>${to}</b>
+
+          <br><br>
+
+          📏 ${(d.routes[0].distance/1000).toFixed(1)} км
+
+          <br>
+
+          🕐 ~${Math.round(d.routes[0].duration/60)} мин
+
+        </div>
+
+      </div>`;
+
+  }catch(e){
+
+    result.innerHTML=
+      "<div class='noResult'>Автомаршрут не удалось построить.</div>";
+  }
+}
+
+function findTransport(){
+
+  const from=
+    document.getElementById("fromInput").value.trim();
+
+  const to=
+    document.getElementById("toInput").value.trim();
+
+  if(!from||!to){
+
+    document.getElementById("resultArea").innerHTML=
+      "<div class='noResult'><b>Введите откуда и куда.</b></div>";
+
+    return;
+  }
+
+  transportMode==="marsh"
+    ? searchMarsh(from,to)
+    : carRoute(from,to);
+}
+
+function openTransport(){
+
+  document
+    .getElementById("transportPanel")
+    .classList.add("show");
+}
+
+function closeTransport(){
+
+  document
+    .getElementById("transportPanel")
+    .classList.remove("show");
+}
+
+function setMode(m){
+
+  transportMode=m;
+
+  document
+    .getElementById("marshTab")
+    .classList.toggle(
+      "active",
+      m==="marsh"
+    );
+
+  document
+    .getElementById("carTab")
+    .classList.toggle(
+      "active",
+      m==="car"
+    );
+}
+
+function swapPlaces(){
+
+  const a=document.getElementById("fromInput");
+  const b=document.getElementById("toInput");
+
+  [a.value,b.value]=[
+    b.value,
+    a.value
+  ];
+}
+
+/* ГЛОБАЛЬНЫЙ ПОИСК */
+
+async function searchPlace(){
+
+  const q=
+    document
+      .getElementById("searchInput")
+      .value
+      .trim();
+
+  if(!q)return;
+
+  markers.clearLayers();
+
+  try{
+
+    const d=await geocode(q);
+
+    if(!d.length){
+
+      alert(
+        "Место в Таджикистане не найдено."
+      );
+
+      return;
+    }
+
+    d.forEach(p=>{
+
+      L.marker(
+        [p.lat,p.lon]
+      )
+      .bindPopup(
+        "<b>"+p.name+"</b>"
+      )
+      .addTo(markers);
+    });
+
+    if(d.length === 1){
+
+      map.setView(
+        [d[0].lat,d[0].lon],
+        15
+      );
+
+    }else{
+
+      const bounds =
+        d.map(p=>[p.lat,p.lon]);
+
+      map.fitBounds(
+        bounds,
+        {
+          padding:[80,80]
+        }
+      );
+    }
+
+  }catch(e){
+
+    alert(
+      "Не удалось выполнить поиск."
+    );
+  }
+}
+
+document
+  .getElementById("searchBtn")
+  .onclick=searchPlace;
+
+document
+  .getElementById("searchInput")
+  .addEventListener(
+    "keydown",
+    e=>{
+      if(e.key==="Enter")
+        searchPlace();
+    }
+  );
+
+async function searchCity(c){
+
+  document
+    .getElementById("searchInput")
+    .value=c;
+
+  searchPlace();
+}
+
+/* МОЁ МЕСТОПОЛОЖЕНИЕ */
+
+function showUserPosition(position){
+
+  const lat=position.coords.latitude;
+  const lon=position.coords.longitude;
+  const accuracy=position.coords.accuracy||0;
+
+  if(
+    lat<36.5 ||
+    lat>41.2 ||
+    lon<67 ||
+    lon>75.4
+  ){
+
+    alert(
+      "Ваше местоположение находится за пределами Таджикистана."
+    );
+
+    return;
+  }
+
+  if(userMarker){
+    map.removeLayer(userMarker);
+  }
+
+  if(userAccuracy){
+    map.removeLayer(userAccuracy);
+  }
+
+  userAccuracy=L.circle(
+    [lat,lon],
+    {
+      radius:accuracy,
+      color:"#168447",
+      weight:1,
+      fillColor:"#168447",
+      fillOpacity:.12
+    }
+  ).addTo(map);
+
+  userMarker=L.circleMarker(
+    [lat,lon],
+    {
+      radius:9,
+      color:"#fff",
+      weight:4,
+      fillColor:"#168447",
+      fillOpacity:1
+    }
+  )
+  .addTo(map)
+  .bindPopup(
+    "Вы здесь<br>Точность: "+
+    Math.round(accuracy)+" м"
+  );
+
+  map.setView(
+    [lat,lon],
+    16
+  );
+
+  userMarker.openPopup();
+}
+
+function stopLocationWatch(){
+
+  if(locationWatch!==null){
+
+    navigator.geolocation.clearWatch(
+      locationWatch
+    );
+
+    locationWatch=null;
+  }
+
+  if(locationTimer){
+
+    clearTimeout(locationTimer);
+    locationTimer=null;
+  }
+}
+
+function locateUser(){
+
+  if(!navigator.geolocation){
+
+    alert(
+      "Ваш браузер или WebView не поддерживает геолокацию."
+    );
+
+    return;
+  }
+
+  stopLocationWatch();
+
+  let bestAccuracy=Infinity;
+  let started=Date.now();
+
+  locationWatch=
+    navigator.geolocation.watchPosition(
+
+      position=>{
+
+        const accuracy=
+          position.coords.accuracy||999999;
+
+        if(accuracy<bestAccuracy){
+
+          bestAccuracy=accuracy;
+
+          showUserPosition(position);
+        }
+
+        if(
+          accuracy<=60 ||
+          Date.now()-started>18000
+        ){
+
+          stopLocationWatch();
+        }
+      },
+
+      error=>{
+
+        if(error.code===1){
+
+          stopLocationWatch();
+
+          alert(
+            "Доступ к геолокации запрещён.\n\n"+
+            "Разрешите доступ к местоположению для TAJWAY в настройках телефона."
+          );
+
+        }else if(
+          error.code===2 ||
+          error.code===3
+        ){
+
+        }
+      },
+
+      {
+        enableHighAccuracy:true,
+        maximumAge:0,
+        timeout:20000
+      }
+    );
+
+  locationTimer=setTimeout(()=>{
+
+    if(locationWatch!==null){
+
+      stopLocationWatch();
+
+      if(bestAccuracy===Infinity){
+
+        navigator.geolocation.getCurrentPosition(
+
+          position=>{
+            showUserPosition(position);
+          },
+
+          ()=>{
+
+            alert(
+              "Не удалось получить местоположение.\n\n"+
+              "Включите GPS/Местоположение на телефоне и попробуйте ещё раз."
+            );
+
+          },
+
+          {
+            enableHighAccuracy:false,
+            maximumAge:0,
+            timeout:15000
+          }
+        );
+      }
+    }
+
+  },20000);
+}
+
+/* КАТЕГОРИИ */
+
+async function loadOSM(type){
+
+  markers.clearLayers();
+
+  let q;
+
+  if(type==="circus"){
+
+    q=
+      `[out:json][timeout:30];
+      (
+        nwr(36.5,67,41.2,75.4)["amenity"="theatre"]["theatre:type"="circus"];
+        nwr(36.5,67,41.2,75.4)["name"~"цирк|circus|sirk",i];
+      );
+      out center 150;`;
+
+  }else if(type==="park"){
+
+    q=
+      `[out:json][timeout:30];
+      (
+        nwr(36.5,67,41.2,75.4)["leisure"="park"];
+      );
+      out center 150;`;
+
+  }else{
+
+    const tags={
+
+      restaurant:
+        '["amenity"="restaurant"]',
+
+      hotel:
+        '["tourism"="hotel"]',
+
+      shop:
+        '["shop"]',
+
+      pharmacy:
+        '["amenity"="pharmacy"]',
+
+      fuel:
+        '["amenity"="fuel"]',
+
+      hospital:
+        '["amenity"="hospital"]'
+    };
+
+    q=
+      `[out:json][timeout:25];
+      (
+        nwr${tags[type]}(36.5,67,41.2,75.4);
+      );
+      out center 150;`;
+  }
+
+  try{
+
+    const d=await(
+      await fetch(
+        "https://overpass-api.de/api/interpreter",
+        {
+          method:"POST",
+          body:q
+        }
+      )
+    ).json();
+
+    const b=[];
+
+    d.elements.forEach(x=>{
+
+      const lat=
+        x.lat ??
+        x.center?.lat;
+
+      const lon=
+        x.lon ??
+        x.center?.lon;
+
+      if(
+        lat==null ||
+        lon==null
+      )return;
+
+      const name=
+        x.tags?.name ||
+        (
+          type==="circus"
+            ? "Цирк"
+            : type==="park"
+              ? "Парк"
+              : "Место"
+        );
+
+      L.marker(
+        [lat,lon]
+      )
+      .bindPopup(
+        "<b>"+
+        name+
+        "</b>"
+      )
+      .addTo(markers);
+
+      b.push(
+        [lat,lon]
+      );
+    });
+
+    if(
+      !b.length &&
+      type==="circus"
+    ){
+
+      const circus=
+        await geocode(
+          "Государственный цирк Таджикистана Душанбе"
+        );
+
+      circus.forEach(p=>{
+
+        L.marker(
+          [p.lat,p.lon]
+        )
+        .bindPopup(
+          "<b>Государственный цирк Таджикистана</b>"
+        )
+        .addTo(markers);
+
+        b.push(
+          [p.lat,p.lon]
+        );
+      });
+    }
+
+    if(b.length){
+
+      map.fitBounds(
+        b,
+        {
+          padding:[60,60]
+        }
+      );
+
+    }else{
+
+      alert(
+        type==="circus"
+          ? "Цирк в базе карт не найден."
+          : "Ничего не найдено."
+      );
+    }
+
+  }catch(e){
+
+    alert(
+      "Не удалось загрузить места."
+    );
+  }
+}
+
+/* ТУРИЗМ */
+
+const TOUR=[
+
+  ["Искандаркуль",39.086,68.371,"lakes"],
+  ["Хафткул — Семь озёр",39.17,68.31,"lakes"],
+
+  ["Фанские горы",39.18,68.25,"mountains"],
+  ["Чимтарга",39.16,68.24,"mountains"],
+
+  ["Ягнобская долина",39.08,69.05,"mountains"],
+  ["Каракуль",39.02,73.53,"lakes"],
+
+  ["Сарезское озеро",38.17,72.75,"lakes"],
+  ["Зоркуль",37.45,73.72,"lakes"],
+
+  ["Ямчун",37.02,72.66,"historical"],
+  ["Гармчашма",37.25,71.55,"nature"],
+
+  ["Гиссарская крепость",38.53,68.56,"historical"],
+  ["Ширкент",38.40,68.22,"nature"],
+
+  ["Сафеддара",38.73,68.78,"ski"],
+  ["Нурекское водохранилище",38.38,69.31,"lakes"],
+
+  ["Сари Хосор",38.35,69.78,"nature"],
+  ["Хулбук",37.93,69.77,"historical"],
+
+  ["Саразм",39.51,67.57,"historical"],
+  ["Древний Пенджикент",39.49,67.62,"historical"],
+
+  ["Худжандская крепость",40.28,69.62,"historical"],
+  ["Мавзолей Рудаки",39.68,67.56,"culture"],
+
+  ["Парк Рудаки",38.573,68.787,"beautiful"],
+  ["Озеро Душанбе",38.57,68.77,"beautiful"]
+];
+
+function showTourism(cat){
+
+  markers.clearLayers();
+
+  const arr=
+    cat==="all"
+      ? TOUR
+      : TOUR.filter(
+          x=>x[3]===cat
+        );
+
+  const b=[];
+
+  arr.forEach(x=>{
+
+    L.marker(
+      [x[1],x[2]]
+    )
+    .bindPopup(
+      "<b>"+x[0]+"</b>"
+    )
+    .addTo(markers);
+
+    b.push(
+      [x[1],x[2]]
+    );
+  });
+
+  if(b.length){
+
+    map.fitBounds(
+      b,
+      {
+        padding:[60,60]
+      }
+    );
+  }
+}
+
+/* ЯЗЫК */
+
+const translations = {
+
+  ru: {
+    appName: "TAJWAY",
+    searchPlaceholder: "Найти место в Таджикистане",
+    intro: "Найдите нужное место или выберите категорию.",
+    transportTitle: "🚐 Найти маршрутку",
+    transportSubtitle: "Ищет не только Корвон и Гипрозем — можно вводить любое место.",
+    marshTab: "🚐 Маршрутки",
+    carTab: "🚗 Авто",
+    fromPlaceholder: "Откуда: Саховат, Корвон, Худжанд...",
+    toPlaceholder: "Куда: Гипрозем, Мехргон, Сино...",
+    swapBtn: "⇅ Поменять местами",
+    findBtn: "НАЙТИ МАРШРУТ",
+    hint: "<b>Можно писать как угодно:</b> КОРВОН, корвон, Рынок Корвон, ГИПРОЗЕМГОРОДОК, Саховат рынок, Мехргон и другие названия.",
+    catSights: "Достопримечательности",
+    catRestaurants: "Рестораны",
+    catHotels: "Отели",
+    catShops: "Магазины",
+    catPharmacies: "Аптеки",
+    catFuel: "АЗС",
+    catHospitals: "Больницы",
+    catMarsh: "Маршрутки",
+    catMountains: "Горы",
+    catLakes: "Озёра",
+    catHistory: "История",
+    catNature: "Природа",
+    catSki: "Лыжи",
+    catCulture: "Культура",
+    catBeautiful: "Красивые места",
+    catCircus: "Цирк",
+    catParks: "Парки",
+    cityDushanbe: "Душанбе",
+    cityKhujand: "Худжанд",
+    cityBokhtar: "Бохтар",
+    cityKulyab: "Куляб",
+    cityKhorog: "Хорог",
+    cityTursunzade: "Турсунзаде",
+    cityIstaravshan: "Истаравшан",
+    cityIsfara: "Исфара"
+  },
+
+  tg: {
+    appName: "TAJWAY",
+    searchPlaceholder: "Ҷой дар Тоҷикистон ҷустуҷӯ кунед",
+    intro: "Ҷои лозимаро ёбед ё категорияро интихоб кунед.",
+    transportTitle: "🚐 Микроавтобус ёбед",
+    transportSubtitle: "На танҳо Корвон ва Гипрозем — ҳар ҷоро ворид кардан мумкин аст.",
+    marshTab: "🚐 Микроавтобус",
+    carTab: "🚗 Автомобил",
+    fromPlaceholder: "Аз куҷо: Саховат, Корвон, Хуҷанд...",
+    toPlaceholder: "Ба куҷо: Гипрозем, Меҳргон, Сино...",
+    swapBtn: "⇅ Ҷой иваз кунед",
+    findBtn: "РОҲРО ЁБЕД",
+    hint: "<b>Ба ҳар шакл навистан мумкин:</b> КОРВОН, корвон, Бозори Корвон, ГИПРОЗЕМШАҲР, Бозори Саховат, Меҳргон ва номҳои дигар.",
+    catSights: "Тамосҳо",
+    catRestaurants: "Ресторанҳо",
+    catHotels: "Меҳмонхонаҳо",
+    catShops: "Мағозаҳо",
+    catPharmacies: "Дорухонаҳо",
+    catFuel: "Сӯзишворӣ",
+    catHospitals: "Беморхонаҳо",
+    catMarsh: "Микроавтобус",
+    catMountains: "Кӯҳҳо",
+    catLakes: "Кӯлҳо",
+    catHistory: "Таърих",
+    catNature: "Табиат",
+    catSki: "Лижа",
+    catCulture: "Фарҳанг",
+    catBeautiful: "Ҷойҳои зебо",
+    catCircus: "Сирек",
+    catParks: "Боғҳо",
+    cityDushanbe: "Душанбе",
+    cityKhujand: "Хуҷанд",
+    cityBokhtar: "Бохтар",
+    cityKulyab: "Кӯлоб",
+    cityKhorog: "Хоруғ",
+    cityTursunzade: "Турсунзода",
+    cityIstaravshan: "Истаравшан",
+    cityIsfara: "Исфара"
+  },
+
+  en: {
+    appName: "TAJWAY",
+    searchPlaceholder: "Find a place in Tajikistan",
+    intro: "Find the place or select a category.",
+    transportTitle: "🚐 Find a minibus",
+    transportSubtitle: "Searches not only Korvon and Giprozem — you can enter any place.",
+    marshTab: "🚐 Minibus",
+    carTab: "🚗 Car",
+    fromPlaceholder: "From: Sakhovat, Korvon, Khujand...",
+    toPlaceholder: "To: Giprozem, Mehrgon, Sino...",
+    swapBtn: "⇅ Swap places",
+    findBtn: "FIND ROUTE",
+    hint: "<b>You can write any way:</b> KORVON, korvon, Korvon Market, GIPROZEM, Sakhovat Market, Mehrgon and other names.",
+    catSights: "Sights",
+    catRestaurants: "Restaurants",
+    catHotels: "Hotels",
+    catShops: "Shops",
+    catPharmacies: "Pharmacies",
+    catFuel: "Gas stations",
+    catHospitals: "Hospitals",
+    catMarsh: "Minibuses",
+    catMountains: "Mountains",
+    catLakes: "Lakes",
+    catHistory: "History",
+    catNature: "Nature",
+    catSki: "Ski",
+    catCulture: "Culture",
+    catBeautiful: "Beautiful places",
+    catCircus: "Circus",
+    catParks: "Parks",
+    cityDushanbe: "Dushanbe",
+    cityKhujand: "Khujand",
+    cityBokhtar: "Bokhtar",
+    cityKulyab: "Kulyab",
+    cityKhorog: "Khorog",
+    cityTursunzade: "Tursunzade",
+    cityIstaravshan: "Istaravshan",
+    cityIsfara: "Isfara"
+  }
+};
+
+const supportedLangs=[
+  "ru",
+  "tg",
+  "en"
+];
+
+let currentLang=
+  localStorage.getItem("tajway_lang")||"ru";
+
+function applyLanguage(lang){
+
+  const t=
+    translations[lang]||
+    translations["en"];
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach(el=>{
+
+      const key=
+        el.dataset.i18n;
+
+      if(t[key]!==undefined){
+
+        el.innerHTML=
+          t[key];
+      }
+    });
+
+  document
+    .querySelectorAll("[data-i18n-placeholder]")
+    .forEach(el=>{
+
+      const key=
+        el.dataset.i18nPlaceholder;
+
+      if(t[key]!==undefined){
+
+        el.placeholder=
+          t[key];
+      }
+    });
+
+  localStorage.setItem(
+    "tajway_lang",
+    lang
+  );
+
+  currentLang=lang;
+
+  document
+    .getElementById("languagePanel")
+    .classList.remove("show");
+}
+
+document
+  .querySelectorAll(".lang")
+  .forEach(btn=>{
+
+    btn.addEventListener(
+      "click",
+      function(){
+
+        const lang=
+          this.dataset.lang;
+
+        if(
+          lang &&
+          translations[lang]
+        ){
+
+          applyLanguage(lang);
+
+        }else{
+
+          applyLanguage("en");
+        }
+      }
+    );
+  });
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    applyLanguage(
+      currentLang
+    );
+
+  }
+);
+
+function toggleLanguage(){
+
+  document
+    .getElementById("languagePanel")
+    .classList.toggle("show");
+}
+
+/* BOTTOM SHEET */
+
+const sheet=
+  document.getElementById(
+    "bottomSheet"
+  );
+
+const scroll=
+  document.getElementById(
+    "sheetScroll"
+  );
+
+const handle=
+  document.getElementById(
+    "sheetHandle"
+  );
+
+let touchStartY=0;
+let touchStartX=0;
+let touchMoved=false;
+
+function setSheetCollapsed(v){
+
+  sheet.classList.toggle(
+    "collapsed",
+    !!v
+  );
+
+  setTimeout(()=>{
+
+    map.invalidateSize({
+      pan:false
+    });
+
+  },230);
+}
+
+handle.addEventListener(
+  "click",
+  ()=>{
+
+    setSheetCollapsed(
+      !sheet.classList.contains(
+        "collapsed"
+      )
+    );
+
+  }
+);
+
+sheet.addEventListener(
+  "touchstart",
+  e=>{
+
+    if(!e.touches[0])return;
+
+    touchStartY=
+      e.touches[0].clientY;
+
+    touchStartX=
+      e.touches[0].clientX;
+
+    touchMoved=false;
+
+    sheet.classList.add(
+      "dragging"
+    );
+
+  },
+  {
+    passive:true
+  }
+);
+
+sheet.addEventListener(
+  "touchmove",
+  e=>{
+
+    if(!e.touches[0])return;
+
+    const dy=
+      e.touches[0].clientY-
+      touchStartY;
+
+    const dx=
+      e.touches[0].clientX-
+      touchStartX;
+
+    if(
+      Math.abs(dy)>12 &&
+      Math.abs(dy)>Math.abs(dx)
+    ){
+
+      touchMoved=true;
+    }
+
+  },
+  {
+    passive:true
+  }
+);
+
+sheet.addEventListener(
+  "touchend",
+  e=>{
+
+    sheet.classList.remove(
+      "dragging"
+    );
+
+    if(!touchMoved)return;
+
+    const dy=
+      e.changedTouches[0].clientY-
+      touchStartY;
+
+    if(dy>45){
+
+      setSheetCollapsed(true);
+
+    }else if(dy<-45){
+
+      setSheetCollapsed(false);
+    }
+
+  },
+  {
+    passive:true
+  }
+);
+
+scroll.addEventListener(
+  "scroll",
+  ()=>{
+
+    if(
+      sheet.classList.contains(
+        "collapsed"
+      )
+    )return;
+
+  }
+);
+
+/* ЗАПУСК */
+
+loadTJ();
 
 </script>
 
