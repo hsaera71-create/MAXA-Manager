@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>MAXA Manager</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+    --bg: #0b0c0f;
+    --card: #14161b;
+    --card2: #1b1e24;
+    --line: #282c34;
+    --text: #f5f5f5;
+    --muted: #9298a3;
+    --accent: #ffffff;
+    --accentText: #0b0c0f;
+}
+
+body.light {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --card2: #eceef1;
+    --line: #dfe2e7;
+    --text: #111318;
+    --muted: #6e7480;
+    --accent: #111318;
+    --accentText: #ffffff;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    padding-bottom: 75px;
+}
+
+/* HEADER */
+
+.header {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--accent);
+    color: var(--accentText);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.brand-name {
+    font-weight: 900;
+    font-size: 18px;
+}
+
+.brand-version {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.menu-button {
+    width: 43px;
+    height: 43px;
+    border-radius: 13px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--text);
+    font-size: 21px;
+}
+
+/* SEARCH */
+
+.search {
+    margin: 2px 16px 16px;
+    height: 48px;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 9px;
+}
+
+.search span {
+    color: var(--muted);
+    font-size: 19px;
+}
+
+.search input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.search input::placeholder {
+    color: var(--muted);
+}
+
+/* MAIN */
+
+main {
+    padding: 0 16px;
+}
+
+.path {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 13px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    border-radius: 13px;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.path strong {
+    color: var(--text);
+}
+
+.path span {
+    color: var(--muted);
+}
+
+/* FILES */
+
+.file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 7px;
+    border-bottom: 1px solid var(--line);
+}
+
+.file-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: var(--card2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-meta {
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.file-more {
+    background: transparent;
+    color: var(--muted);
+    font-size: 20px;
+}
+
+/* BOTTOM */
+
+.bottom {
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 57px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 30;
+}
+
+.bottom button {
+    background: transparent;
+    color: var(--muted);
+    font-size: 20px;
+}
+
+.bottom button.active {
+    color: var(--text);
+}
+
+/* SIDE MENU */
+
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,.55);
+}
+
+.overlay.show {
+    display: block;
+}
+
+.side-menu {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(88%, 390px);
+    background: var(--bg);
+    border-left: 1px solid var(--line);
+    padding: 18px 15px 25px;
+    overflow-y: auto;
+    animation: menuIn .2s ease;
+}
+
+@keyframes menuIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 2px 17px;
+    border-bottom: 1px solid var(--line);
+}
+
+.menu-title {
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.close {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 18px;
+}
+
+.menu-section {
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 20px 3px 8px;
+}
+
+.menu-item {
+    width: 100%;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    border-radius: 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text);
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    text-align: left;
+}
+
+.menu-item:active {
+    background: var(--card2);
+    border-color: var(--line);
+}
+
+.menu-icon {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    border-radius: 11px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.menu-text {
+    flex: 1;
+}
+
+.menu-text strong {
+    display: block;
+    font-size: 13px;
+}
+
+.menu-text span {
+    display: block;
+    color: var(--muted);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.menu-arrow {
+    color: var(--muted);
+}
+
+/* MODAL */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,.65);
+    align-items: flex-end;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+
+.modal {
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: var(--card);
+    border-radius: 25px 25px 0 0;
+    padding: 21px 18px 30px;
+    animation: modalUp .2s ease;
+}
+
+@keyframes modalUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.handle {
+    width: 40px;
+    height: 4px;
+    border-radius: 20px;
+    background: var(--line);
+    margin: 0 auto 20px;
+}
+
+.modal h2 {
+    margin: 0;
+    font-size: 19px;
+}
+
+.modal p {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.modal-button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 13px;
+    border: 1px solid var(--line);
+    background: var(--card2);
+    color: var(--text);
+    font-weight: 700;
+}
+
+/* TOAST */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 82px;
+    transform: translate(-50%, 20px);
+    background: var(--text);
+    color: var(--bg);
+    padding: 11px 15px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: .2s;
+    z-index: 300;
+    max-width: 90%;
+    text-align: center;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="brand">
+        <div class="logo">M</div>
+
+        <div>
+            <div class="brand-name">MAXA Manager</div>
+            <div class="brand-version">Android Utility</div>
+        </div>
+    </div>
+
+    <button class="menu-button" onclick="openMenu()">☰</button>
+
+</header>
+
+
+<div class="search">
+    <span>⌕</span>
+    <input
+        id="search"
+        type="search"
+        placeholder="Поиск файлов..."
+        oninput="searchFiles()"
+    >
+</div>
+
+
+<main>
+
+    <div class="path">
+        <strong>Внутренняя память</strong>
+        <span>/storage/emulated/0</span>
+    </div>
+
+
+    <div id="fileList">
+
+        <div class="file">
+            <div class="file-icon">▰</div>
+
+            <div class="file-info">
+                <div class="file-name">Download</div>
+                <div class="file-meta">Папка</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('Download')">⋮</button>
+        </div>
+
+
+        <div class="file">
+            <div class="file-icon">▰</div>
+
+            <div class="file-info">
+                <div class="file-name">DCIM</div>
+                <div class="file-meta">Папка</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('DCIM')">⋮</button>
+        </div>
+
+
+        <div class="file">
+            <div class="file-icon">▰</div>
+
+            <div class="file-info">
+                <div class="file-name">Pictures</div>
+                <div class="file-meta">Папка</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('Pictures')">⋮</button>
+        </div>
+
+
+        <div class="file">
+            <div class="file-icon">APK</div>
+
+            <div class="file-info">
+                <div class="file-name">example.apk</div>
+                <div class="file-meta">APK • 82.4 MB</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('example.apk')">⋮</button>
+        </div>
+
+
+        <div class="file">
+            <div class="file-icon">ZIP</div>
+
+            <div class="file-info">
+                <div class="file-name">archive.zip</div>
+                <div class="file-meta">ZIP • 24.8 MB</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('archive.zip')">⋮</button>
+        </div>
+
+
+        <div class="file">
+            <div class="file-icon">TXT</div>
+
+            <div class="file-info">
+                <div class="file-name">notes.txt</div>
+                <div class="file-meta">TXT • 8 KB</div>
+            </div>
+
+            <button class="file-more" onclick="showInfo('notes.txt')">⋮</button>
+        </div>
+
+    </div>
+
+</main>
+
+
+<!-- BOTTOM -->
+
+<div class="bottom">
+
+    <button class="active" onclick="showToast('Главная')">⌂</button>
+
+    <button onclick="showToast('Избранное')">☆</button>
+
+    <button onclick="showToast('История')">◷</button>
+
+</div>
+
+
+<!-- SIDE MENU -->
+
+<div id="overlay" class="overlay" onclick="closeMenu(event)">
+
+    <aside class="side-menu">
+
+        <div class="menu-header">
+
+            <div class="menu-title">Инструменты</div>
+
+            <button class="close" onclick="closeMenu()">×</button>
+
+        </div>
+
+
+        <div class="menu-section">APK</div>
+
+
+        <button class="menu-item" onclick="tool('Извлечь APK')">
+            <div class="menu-icon">APK</div>
+
+            <div class="menu-text">
+                <strong>Извлечь APK</strong>
+                <span>Получить APK установленного приложения</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Анализ APK')">
+            <div class="menu-icon">⌘</div>
+
+            <div class="menu-text">
+                <strong>Анализ APK</strong>
+                <span>Информация, размер, версия и структура</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Резервная копия APK')">
+            <div class="menu-icon">▣</div>
+
+            <div class="menu-text">
+                <strong>Резервная копия APK</strong>
+                <span>Сохранить APK приложения в память</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Просмотр Manifest')">
+            <div class="menu-icon">{ }</div>
+
+            <div class="menu-text">
+                <strong>AndroidManifest</strong>
+                <span>Просмотр содержимого Manifest</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Разрешения приложения')">
+            <div class="menu-icon">✓</div>
+
+            <div class="menu-text">
+                <strong>Разрешения</strong>
+                <span>Посмотреть разрешения приложения</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <div class="menu-section">Архивы</div>
+
+
+        <button class="menu-item" onclick="tool('Извлечь архив')">
+            <div class="menu-icon">↓</div>
+
+            <div class="menu-text">
+                <strong>Извлечь архив</strong>
+                <span>Распаковать ZIP и другие поддерживаемые архивы</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Создать архив')">
+            <div class="menu-icon">↑</div>
+
+            <div class="menu-text">
+                <strong>Создать архив</strong>
+                <span>Собрать файлы в ZIP</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <div class="menu-section">Файлы</div>
+
+
+        <button class="menu-item" onclick="tool('Текстовый редактор')">
+            <div class="menu-icon">T</div>
+
+            <div class="menu-text">
+                <strong>Текстовый редактор</strong>
+                <span>Открыть и редактировать текстовые файлы</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('HEX редактор')">
+            <div class="menu-icon">HEX</div>
+
+            <div class="menu-text">
+                <strong>HEX-редактор</strong>
+                <span>Просмотр бинарных данных файла</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Поиск в файлах')">
+            <div class="menu-icon">⌕</div>
+
+            <div class="menu-text">
+                <strong>Поиск в файлах</strong>
+                <span>Найти текст или файл по названию</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Информация о файле')">
+            <div class="menu-icon">i</div>
+
+            <div class="menu-text">
+                <strong>Информация о файле</strong>
+                <span>Размер, дата, путь и тип</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Хеш файла')">
+            <div class="menu-icon">#</div>
+
+            <div class="menu-text">
+                <strong>Хеш файла</strong>
+                <span>MD5, SHA-1 и SHA-256</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <div class="menu-section">Система</div>
+
+
+        <button class="menu-item" onclick="tool('Установленные приложения')">
+            <div class="menu-icon">▦</div>
+
+            <div class="menu-text">
+                <strong>Установленные приложения</strong>
+                <span>Список приложений на устройстве</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Анализ памяти')">
+            <div class="menu-icon">◫</div>
+
+            <div class="menu-text">
+                <strong>Анализ памяти</strong>
+                <span>Найти большие файлы и папки</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Очистка')">
+            <div class="menu-icon">✦</div>
+
+            <div class="menu-text">
+                <strong>Очистка</strong>
+                <span>Поиск ненужных временных файлов</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <div class="menu-section">Дополнительно</div>
+
+
+        <button class="menu-item" onclick="tool('QR генератор')">
+            <div class="menu-icon">QR</div>
+
+            <div class="menu-text">
+                <strong>QR-генератор</strong>
+                <span>Создать QR-код из текста или ссылки</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="tool('Конвертер')">
+            <div class="menu-icon">↔</div>
+
+            <div class="menu-text">
+                <strong>Конвертер</strong>
+                <span>Размеры файлов, единицы и другие расчёты</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="toggleTheme()">
+            <div class="menu-icon">◐</div>
+
+            <div class="menu-text">
+                <strong>Тема</strong>
+                <span>Изменить оформление MAXA Manager</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+
+        <button class="menu-item" onclick="showAbout()">
+            <div class="menu-icon">i</div>
+
+            <div class="menu-text">
+                <strong>О приложении</strong>
+                <span>MAXA Manager • версия 1.0</span>
+            </div>
+
+            <div class="menu-arrow">›</div>
+        </button>
+
+    </aside>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div id="modal" class="modal-overlay" onclick="closeModal(event)">
+
+    <div class="modal">
+
+        <div class="handle"></div>
+
+        <h2 id="modalTitle">MAXA Manager</h2>
+
+        <p id="modalText"></p>
+
+        <button class="modal-button" onclick="closeModal()">
+            Закрыть
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+
+/* MENU */
+
+function openMenu() {
+    document.getElementById("overlay").classList.add("show");
+}
+
+function closeMenu(event) {
+
+    if (!event || event.target.id === "overlay") {
+        document.getElementById("overlay").classList.remove("show");
+    }
+}
+
+
+/* TOOLS */
+
+function tool(name) {
+
+    closeMenu();
+
+    document.getElementById("modalTitle").textContent = name;
+
+    document.getElementById("modalText").textContent =
+        "Интерфейс функции готов. На этапе AndroidIDE эта функция будет подключена к Kotlin и получит настоящий доступ к Android.";
+
+    document.getElementById("modal").classList.add("show");
+}
+
+
+/* FILE INFO */
+
+function showInfo(name) {
+
+    document.getElementById("modalTitle").textContent = name;
+
+    document.getElementById("modalText").textContent =
+        "Подробная информация о файле будет получена через Kotlin после переноса MAXA Manager в AndroidIDE.";
+
+    document.getElementById("modal").classList.add("show");
+}
+
+
+/* ABOUT */
+
+function showAbout() {
+
+    closeMenu();
+
+    document.getElementById("modalTitle").textContent = "MAXA Manager";
+
+    document.getElementById("modalText").textContent =
+        "Универсальный Android-менеджер. Версия интерфейса 1.0.";
+
+    document.getElementById("modal").classList.add("show");
+}
+
+
+/* MODAL CLOSE */
+
+function closeModal(event) {
+
+    if (!event || event.target.id === "modal") {
+        document.getElementById("modal").classList.remove("show");
+    }
+}
+
+
+/* TOAST */
+
+function showToast(text) {
+
+    const toast = document.getElementById("toast");
+
+    toast.textContent = text;
+    toast.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(function() {
+        toast.classList.remove("show");
+    }, 1800);
+}
+
+
+/* SEARCH */
+
+function searchFiles() {
+
+    const query = document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const files = document.querySelectorAll(".file");
+
+    files.forEach(function(file) {
+
+        const text = file.textContent.toLowerCase();
+
+        file.style.display =
+            text.includes(query) ? "flex" : "none";
+
+    });
+}
+
+
+/* THEME */
+
+function toggleTheme() {
+
+    document.body.classList.toggle("light");
+
+    if (document.body.classList.contains("light")) {
+        localStorage.setItem("maxa_theme", "light");
+        showToast("Светлая тема");
+    } else {
+        localStorage.setItem("maxa_theme", "dark");
+        showToast("Тёмная тема");
+    }
+}
+
+
+/* LOAD THEME */
+
+if (localStorage.getItem("maxa_theme") === "light") {
+    document.body.classList.add("light");
+}
+
+
+/* ESC */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+        closeMenu();
+        closeModal();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
